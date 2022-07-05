@@ -27,14 +27,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-db.connect((err)=>{
-  if(err) console.log("connection error "+err)
-  else console.log("Database connected to port 27017")
-}) 
-app.use(session({secret:"key", resave:false,saveUninitialized:true, cookie:{maxAge:600000}}));
+
+app.use(session({secret:"key", resave:false,saveUninitialized:true, cookie:{maxAge:6000000000000000000000000}}));
 app.use('/', indexRouter);
 app.use('/admin', adminRouter);
 app.use('/vendor',vendorRouter);
+app.use((req,res,next)=>{
+  res.locals.session = req.session
+  next()
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

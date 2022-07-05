@@ -1,0 +1,17 @@
+#email-error,#password-error{
+    font-size: 1rem !important;
+    color: red;
+  }
+
+
+
+  .dash-container{
+    background-color: white;
+  }
+
+  .form-control, .form-control-lg{
+    width: 20.5rem !important;
+    height: 45px !important;
+  }
+
+  
