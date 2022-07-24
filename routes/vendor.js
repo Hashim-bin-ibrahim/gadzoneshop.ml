@@ -4,17 +4,11 @@ const Vendor = require('../models/vendor')
 
 var vendorHelper = require('../helpers/vendor-helper')
 var adminHelpers = require('../helpers/admin-helpers')
+const userHelper = require('../helpers/user-helpers')
 var sms = require('../config/verify');
 const store = require('../public/middleware/multer');
-const async = require('hbs/lib/async');
-const { exists } = require('../models/product');
-// const { mkdirSync } = require('fs');
-// const { deserialize } = require('v8');
-// const { METHODS } = require('http');
-// const { startSession, exists } = require('../models/category');
-// const { trusted } = require('mongoose');
-// const { response } = require('express');
-// get methods......
+
+
 
 var exist = false
 
@@ -157,7 +151,6 @@ router.post('/otpVerify', (req, res) => {
       vendorHelper.doSignup(req.session.vendorData).then((response) => {
         console.log(response);
         res.redirect('/vendor')
-
       })
     } else {
       console.log("verification problemm");
@@ -172,8 +165,7 @@ router.post('/otpVerify', (req, res) => {
 router.post('/vendor-signup', (req, res) => {
   vendorHelper.vendorAvlCheck(req.body).then((response) => {
     if (response) {
-      console.log(response)
-      console.log("vendor already exist");
+   
       req.session.signupErr = true
       res.redirect('/vendor/vendor-signup')
     } else {
@@ -277,7 +269,7 @@ router.post('/add-product',vendorLoggedIn, store.array('images', 4), (req, res) 
   vendorHelper.addProduct(req,Vendors).then(async (response) => {
     // let user = await Vendor.findOne({email:vendorData.email,canLogin:true})
     // console.log(user);
-    if (response) {
+    if (response.proExist) {
       req.session.proExistsErr = true
       res.redirect('/vendor/add-product')
     } else {
@@ -286,11 +278,115 @@ router.post('/add-product',vendorLoggedIn, store.array('images', 4), (req, res) 
   })
 })
 
+
+
+
+//coupon create page
+
+
+
 //logout  
 router.get('/logout',(req,res)=>{
   res.header('Cache-control', 'no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
   req.session.vendorLogiin = false;
   res.redirect('/vendor')
 })
+
+router.get('/order_list',async(req,res)=>{
+  const vendorId = req.session.vendorDetails._id
+  
+  await vendorHelper.getOrderList(vendorId).then((orderedPro)=>{
+    res.render('vendor/user_orderList',{vendorLogin: true,orderedPro:orderedPro})
+  })
+
+ 
+})
+
+router.get('/ordered_pro_details',(req,res)=>{
+
+  let {orderId,productId}=req.query
+
+  // vendorHelper.orderedProDetails(proId).then((proDtails)=>{
+  //   res.render('vendor/orderedProDetails',{proDtails:proDtails})
+  // })
+  userHelper.orderedProList(productId).then(async(proDetails) => {
+    let orderData =await userHelper.orderDetails(orderId)
+    res.render('vendor/orderedProDetails',{proDetails:proDetails,orderData:orderData})
+  })
+})
+
+
+router.post('/status_packed',(req,res)=>{
+  let {order_Id,product_Id}=req.body
+
+  console.log(order_Id);
+  console.log(product_Id);
+  vendorHelper.packProduct(order_Id,product_Id).then((response)=>{
+    
+    if(response){
+      res.json({status:true})
+    }
+    
+  })
+  
+
+})
+
+
+
+router.post('/status_shipped',(req,res)=>{
+  let {order_Id,product_Id}=req.body
+
+  console.log(order_Id);
+  console.log(product_Id);
+  vendorHelper.shippProduct(order_Id,product_Id).then((response)=>{
+  
+    if(response){
+      res.json({status:true})
+    }
+    
+  })
+  
+
+})
+
+
+
+router.post('/status_delivered',(req,res)=>{
+  let {order_Id,product_Id}=req.body
+
+  console.log(order_Id);
+  console.log(product_Id);
+  vendorHelper.deliverProduct(order_Id,product_Id).then((response)=>{
+  
+    if(response){
+      res.json({status:true})
+    }
+  })
+})
+
+router.post('/status_cancelled',(req,res)=>{
+  let {order_Id,product_Id}=req.body
+
+  console.log(order_Id);
+  console.log(product_Id);
+  vendorHelper.cancelProduct(order_Id,product_Id).then((response)=>{
+  
+    if(response){
+      res.json({status:true})
+    }
+    
+  })
+  
+
+})
+
+router.get('/users_list',(req,res)=>{
+  vendorHelper.getUsersDetails().then((data)=>{
+    res.render('vendor/users_List',{vendorLogin: true,data:data})
+  })
+ 
+})
+
 
 module.exports = router;

@@ -64,6 +64,7 @@ let availableCat = (rendorData)=>{
 // product list by corresponding category
 
 let proByCat = (proId)=>{
+  
   return new Promise(async(resolve,reject)=>{
     var response ={}
     let avlPro = await product.aggregate(

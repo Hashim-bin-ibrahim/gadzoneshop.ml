@@ -1,19 +1,19 @@
 var db = require('../config/connection')
-
 const { resolve } = require('path')
 const async = require('hbs/lib/async')
 var objectId = require('mongodb').ObjectId
 var bcrypt = require('bcrypt')
 const category = require('../models/category')
 const Vendor = require('../models/vendor')
+
 const product = require('../models/product')
-// const { AuthRegistrationsCredentialListMappingList } = require('twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authRegistrationsMapping/authRegistrationsCredentialListMapping')
 const req = require('express/lib/request')
 const { Promise } = require('mongoose')
+const coupon = require('../models/coupon')
+const order = require('../models/order')
 
 module.exports = {
   vendorAvlCheck: (vendorData) => {
-    console.log(vendorData);
     return new Promise(async (resolve, reject) => {
       const exist = await Vendor.findOne({ email: vendorData.email })
       if (exist) {
@@ -25,19 +25,11 @@ module.exports = {
         resolve(vendorExist)
 
       }
-      //     else{
-      //         vendorData.password = await bcrypt.hash(vendorData.password,10)
-      //      Vendor.create({name:vendorData.name,email : vendorData.email,password:vendorData.password,phoneNumber : vendorData.phonenumber})
-      //             
-
-
-
-      // } 
     })
   },
   doSignup: (vendorData) => {
     console.log(vendorData);
-    console.log("haaaai");
+
     return new Promise(async (resolve, reject) => {
       vendorData.password = await bcrypt.hash(vendorData.password, 10)
       const vendors = Vendor.create({ name: vendorData.name, email: vendorData.email, password: vendorData.password, phoneNumber: vendorData.phonenumber })
@@ -106,7 +98,7 @@ module.exports = {
       console.log(user);
 
       if (user) {
-        const password = await bcrypt.compare(vendorData.password,user.password )
+        const password = await bcrypt.compare(vendorData.password, user.password)
         if (password) {
           response.vendorDetails = user;
           response.status = true;
@@ -128,18 +120,17 @@ module.exports = {
   },
   addProduct: (req, Vendors) => {
     const newProduct = req.body;
-    console.log(newProduct);
     const files = req.files;
     vendorInfo = Vendors
-    console.log(vendorInfo);
-                                  
-    
+    let response = {}
+
     return new Promise(async (resolve, reject) => {
       const exist = await product.exists({ name: newProduct.name })
       if (exist) {
         response.proExist = true
         resolve(response)
       } else {
+        response.proExist = false
         //for  getting vendor _id
         const venData = await Vendor.findOne({ name: vendorInfo.name })
         const objIdVendor = venData._id
@@ -161,7 +152,6 @@ module.exports = {
             brand_name: newProduct.brand_name,
             productPictures: files,
             createdBy: objIdVendor,
-
           }
         )
         await proObj.save().then((response) => {
@@ -171,6 +161,43 @@ module.exports = {
       }
     })
   },
+  addCoupon: (req) => {
+    let newCoupon = req.body;
+    let response = {}
+
+    return new Promise(async (resolve, reject) => {
+      const exist = await coupon.exists({ couponCode: newCoupon.couponCode })
+      if (exist) {
+        console.log("couponExist");
+        response.couponExist = true
+        resolve(response)
+      } else {
+        console.log("coupon not exist");
+
+        const new_Coupon = new coupon(
+          {
+            couponCode: newCoupon.couponCode,
+            description: newCoupon.description,
+            couponType: newCoupon.couponType,
+            couponValue: newCoupon.couponValue,
+            couponValidFrom: newCoupon.couponValidFrom,
+            couponValidTo: newCoupon.couponValidTo,
+            minValue: newCoupon.minValue,
+            maxVAlue: newCoupon.maxVAlue,
+            limit: newCoupon.limit,
+            couponUsageLimit: newCoupon.couponUsageLimit,
+            // category: objIdCategory,
+
+          }
+        )
+        await new_Coupon.save().then((response) => {
+          console.log(response);
+          resolve(response)
+        })
+      }
+    })
+  },
+
   //    addCategory : (vendorData)=>{
   //        return new promise (async(resolve,reject)=>{
   //         await category.create(vendorData).then((data)=>{
@@ -352,7 +379,188 @@ module.exports = {
         }
       ])
     })
-  }
-  // 'result.name': 'mobile phone'
+  },
+  getOrderList: (vendorId) => {
+    return new Promise(async (resolve, reject) => {
+      let orderList = await order.aggregate([
+        {
+          '$project': {
+            '__v': 0
+          }
+        }, {
+          '$lookup': {
+            'from': 'users',
+            'localField': 'user',
+            'foreignField': '_id',
+            'as': 'userLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$userLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$products'
+          }
+        }, {
+          '$lookup': {
+            'from': 'products',
+            'localField': 'products.product',
+            'foreignField': '_id',
+            'as': 'productLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$productLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$productLookup.productPictures'
+          }
+        }, {
+          '$lookup': {
+            'from': 'vendors',
+            'localField': 'productLookup.createdBy',
+            'foreignField': '_id',
+            'as': 'vendorLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$vendorLookup'
+          }
+        }, {
+          '$match': {
+            'vendorLookup._id': objectId(vendorId)
+          }
+        }, {
+          '$sort': {
+            '_id': -1
+          }
+        }
+      ])
 
+      resolve(orderList)
+    })
+
+  },
+  orderedProDetails: (proId) => {
+    return new Promise(async (resolve, reject) => {
+      let proDetails = await product.aggregate([
+        {
+          '$match': {
+            '_id': objectId(proId)
+          }
+        }, {
+          '$lookup': {
+            'from': 'categories',
+            'localField': 'category',
+            'foreignField': '_id',
+            'as': 'categoryLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$categoryLookup'
+          }
+        }, {
+          '$lookup': {
+            'from': 'vendors',
+            'localField': 'createdBy',
+            'foreignField': '_id',
+            'as': 'vandorLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$vandorLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$productPictures'
+          }
+        }
+      ])
+      console.log("--------------------------------------");
+      console.log(proDetails);
+      resolve(proDetails)
+    })
+
+  },
+  packProduct : (orderId,productId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
+      {
+        $set : {
+          'products.$.placed' : false,'products.$.packed':true,'products.$.orderStatus' : "packed"
+        }
+      }).then((response)=>{
+        
+        response.status = true
+        resolve(response)
+      })
+    })
+  },
+  shippProduct : (orderId,productId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
+      {
+        $set : {
+          'products.$.packed' : false,'products.$.shipped':true,'products.$.orderStatus' : "shipped"
+        }
+      }).then((response)=>{
+        response.status = true
+        resolve(response)
+      })
+    })
+  },
+
+  deliverProduct : (orderId,productId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
+      {
+        $set : {
+          'products.$.shipped' : false,'products.$.delivered':true,'products.$.orderStatus' : "delivered"
+        }
+      }).then((response)=>{
+        response.status = true
+        resolve(response)
+      })
+    })
+  },
+
+  cancelProduct : (orderId,productId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
+      {
+        $set : {
+          'products.$.delivered' : false,'products.$.cancelled':true,'products.$.orderStatus' : "cancelled"
+        }
+      }).then((response)=>{
+        response.status = true
+        resolve(response)
+      })
+    })
+  },
+  getUsersDetails : ()=>{
+    return new Promise (async(resolve,reject)=>{
+     let userData =  await order.aggregate([
+        {
+          '$project': {
+            '__v': 0
+          }
+        }, {
+          '$lookup': {
+            'from': 'users', 
+            'localField': 'user', 
+            'foreignField': '_id', 
+            'as': 'usersLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$usersLookup'
+          }
+        }, 
+      ])
+      resolve(userData)
+
+    })
+  }
 }

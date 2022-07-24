@@ -8,6 +8,9 @@ const db = require('./config/connection')
 var session = require('express-session')
 const nocache = require("nocache");
 var fileUpload = require('express-fileupload');
+const dotenv = require('dotenv')
+
+dotenv.config()
 
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
@@ -21,6 +24,11 @@ app.set('view engine', 'hbs');
 app.engine('hbs', hbs.engine({helpers:{inc: function(value, option){
   return parseInt(value)+1;
 }},extname: 'hbs',defaultLayout: 'layout', layoutsDir:__dirname + '/views/layout', partialDir:__dirname + '/views/partials'}));
+
+
+
+
+
 app.use(nocache());
 app.use(logger('dev'));
 app.use(express.json());
@@ -52,5 +60,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
 
 module.exports = app;

@@ -1,0 +1,78 @@
+{{!-- SHOW ALL CATEGORY LIST STARTS--}}
+
+    <div class="viewProducts float-right mr-3">
+    <a href="/admin/coupon" type="button" class="btn btn-primary">+ Add Coupon</a>
+</div>
+
+<div class="dash-container  mt-5 p-4">
+  <h4 class="text-center mb-5">View All Coupons</h4>
+  <section>
+
+  
+
+    <div class="container shadow p-2">
+
+      <table class="table" id="vendors_table">
+
+
+
+
+        <thead>
+          <tr>
+            <th>Sl No</th>
+            <th>Coupon-Name</th>
+            <th>Discount Value</th>
+            <th>Minimum Purchase</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Orders</th>
+            <th>Status</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        
+          {{#each data}}
+          <tr>
+
+            <td>{{inc @index}}</td>
+            <td> {{this.couponCode}}<br>
+            {{this.description}}</td>
+            <td> {{this.couponValue}}</td>
+            <td>{{this.minValue}}</td>
+            <td> {{this.couponValidFrom}}</td>
+            <td> {{this.couponValidTo}}</td>
+            <td> {{this.orders}}</td>
+            <td> {{this.status}}</td>
+            <td>
+              <a href="/vendor/block-pro/{{this._id}}" class="btn btn-danger"
+                onclick="return confirm('are you sur to block  {{this.name}}')">Delete</a>
+            </td>
+          </tr>
+
+
+          {{/each}}
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+
+
+
+
+<script>
+  $(document).ready(function () {
+
+
+    $('#user_table').wrap('<div id="hide" style="display:none"/>');
+
+    $('#hide').css('display', 'block');
+  });
+
+
+  var table = $('#vendors_table').DataTable();
+</script>

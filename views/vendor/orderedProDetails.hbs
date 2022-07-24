@@ -1,0 +1,264 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<section class=" gradient-custom " id="order_card">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100"  >
+      <div class="col-lg-10 col-xl-8" >
+        <div class="card" style="border-radius: 10px;">
+          <div class="card-header px-4 py-5">
+            <h5 class="text-muted mb-0">Thanks for your Order.!</h5>
+          </div>
+
+
+          <div class="card-body p-4" >
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <p class="lead fw-normal mb-0" style="color: #a8729a;">Receipt</p>
+
+              <p class="small text-muted mb-0">Ordered Date : {{orderData.[0].createdAt}}</p><br>
+              <p class="small text-muted mb-0">Order Id : {{orderData.[0]._id}}</p>
+
+            </div>
+            <div class="card shadow-0 border mb-4" >
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/productimages/{{proDetails.[0].productPictures.filename}}" class="img-fluid" alt="Phone">
+                  </div>
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-muted mb-0">{{proDetails.[0].name}}</p>
+                  </div>
+
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-muted mb-0 small">Description: {{proDetails.[0].description}}</p>
+                  </div>
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-muted mb-0 small">Qty: {{orderData.[0].products.quantity}}</p>
+                  </div>
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-muted mb-0 small">Price:{{proDetails.[0].price}}</p>
+                  </div>
+                </div>
+
+                <div class="row" style="display: flex; justify-content: space-around;" >
+                  <div class="col-lg-6  d-flex justify-content-between align-items-center">
+                    <p class="text-muted mb-0 small ">seller : {{proDetails.[0].vendorLookup.name}}</p>
+                    <p class="text-muted mb-0 small">Status : {{ orderData.[0].products.orderStatus}} </p>
+
+                  </div>
+
+                  <div class="col-lg-4">
+
+                    {{#if orderData.[0].products.placed}}
+
+                    <p>change status:</p>
+                    <button class="site-btn" onclick="packedOrder('{{orderData.[0]._id}}','{{proDetails.[0]._id}}')">
+                      packed
+                    </button>
+                    {{/if}}
+
+                    {{#if orderData.[0].products.packed}}
+                    <p>change status:</p>
+                    <button class="site-btn" onclick="shippedOrder('{{orderData.[0]._id}}','{{proDetails.[0]._id}}')">
+                      shipped
+                    </button>
+                    {{/if}}
+
+                     {{#if orderData.[0].products.shipped}}
+                    <p>change status:</p>
+                    <button class="site-btn" onclick="deliveredOrder('{{orderData.[0]._id}}','{{proDetails.[0]._id}}')">
+                      delivered
+                    </button>
+                    {{/if}}
+                  </div>
+
+               
+
+
+
+                </div>
+
+
+
+                <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;">
+
+
+
+
+
+
+                {{#if orderData.[0].products.placed}}
+
+
+                <section class="step-wizard">
+
+                  <ul class="step-wizard-list">
+                    <li class="step-wizard-item current-item" id="first">
+                      <span class="progress-count ">1</span>
+                      <span class="progress-label">Order Placed</span>
+                    </li>
+                    <li class="step-wizard-item " id="second">
+                      <span class="progress-count">2</span>
+                      <span class="progress-label">Item Packed</span>
+                    </li>
+                    <li class="step-wizard-item " id="third">
+                      <span class="progress-count">3</span>
+                      <span class="progress-label">Item Shipped</span>
+                    </li>
+                    <li class="step-wizard-item " id="fourth">
+                      <span class="progress-count">4</span>
+                      <span class="progress-label">Item Delivered</span>
+                    </li>
+                  </ul>
+
+
+                  {{/if}}
+
+
+
+
+                  {{#if orderData.[0].products.packed}}
+
+
+
+                  <section class="step-wizard">
+
+                    <ul class="step-wizard-list">
+                      <li class="step-wizard-item current-item" id="first">
+                        <span class="progress-count ">1</span>
+                        <span class="progress-label">Order Placed</span>
+                      </li>
+                      <li class="step-wizard-item " id="second">
+                        <span class="progress-count">2</span>
+                        <span class="progress-label">Item Packed</span>
+                      </li>
+                      <li class="step-wizard-item " id="third">
+                        <span class="progress-count">3</span>
+                        <span class="progress-label">Item Shipped</span>
+                      </li>
+                      <li class="step-wizard-item " id="fourth">
+                        <span class="progress-count">4</span>
+                        <span class="progress-label">Item Delivered</span>
+                      </li>
+                    </ul>
+                  </section>
+                  <script>
+                    $(document).ready(function () {
+
+                      $("#first").removeClass("current-item");
+                      $("#third").addClass("current-item");
+
+
+                    });
+                  </script>
+
+                  {{/if}}
+
+
+                  {{#if orderData.[0].products.shipped}}
+
+
+
+                  <section class="step-wizard">
+
+                    <ul class="step-wizard-list">
+                      <li class="step-wizard-item current-item" id="first">
+                        <span class="progress-count ">1</span>
+                        <span class="progress-label">Order Placed</span>
+                      </li>
+                      <li class="step-wizard-item " id="second">
+                        <span class="progress-count">2</span>
+                        <span class="progress-label">Item Packed</span>
+                      </li>
+                      <li class="step-wizard-item " id="third">
+                        <span class="progress-count">3</span>
+                        <span class="progress-label">Item Shipped</span>
+                      </li>
+                      <li class="step-wizard-item " id="fourth">
+                        <span class="progress-count">4</span>
+                        <span class="progress-label">Item Delivered</span>
+                      </li>
+                    </ul>
+                  </section>
+                  <script>
+                    $(document).ready(function () {
+
+                      $("#first").removeClass("current-item");
+                      $("#fourth").addClass("current-item");
+
+
+                    });
+                  </script>
+
+                  {{/if}}
+
+
+                  {{#if orderData.[0].products.delivered}}
+
+
+
+                  <section class="step-wizard">
+
+                    <ul class="step-wizard-list">
+                      <li class="step-wizard-item current-item" id="first">
+                        <span class="progress-count ">1</span>
+                        <span class="progress-label">Order Placed</span>
+                      </li>
+                      <li class="step-wizard-item " id="second">
+                        <span class="progress-count">2</span>
+                        <span class="progress-label">Item Packed</span>
+                      </li>
+                      <li class="step-wizard-item " id="third">
+                        <span class="progress-count">3</span>
+                        <span class="progress-label">Item Shipped</span>
+                      </li>
+                      <li class="step-wizard-item " id="fourth">
+                        <span class="progress-count">4</span>
+                        <span class="progress-label">Item Delivered</span>
+                      </li>
+                    </ul>
+                  </section>
+                  <script>
+                    $(document).ready(function () {
+
+                      $("#first").removeClass("current-item");
+
+
+
+                    });
+                  </script>
+
+                  {{/if}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+</section>

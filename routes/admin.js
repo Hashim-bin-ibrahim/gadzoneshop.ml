@@ -2,7 +2,8 @@ var express = require('express');
 const req = require('express/lib/request');
 const adminHelpers = require('../helpers/admin-helpers');
 const vendorHelpers = require('../helpers/vendor-helper')
-const sms = require('../config/verify')
+const sms = require('../config/verify');
+const async = require('hbs/lib/async');
 var router = express.Router();
 
 /* GET users listing. */
@@ -218,6 +219,37 @@ router.post('/otpVerify', (req, res) => {
   })
 
 })
+
+var couponExist = false
+router.get('/coupon',(req,res)=>{
+  couponExist = req.session.couponExist
+  res.render('admin/coupon-create',{adminLogin:true,couponExist:couponExist})
+  couponExist = false
+})
+
+
+router.post('/coupon',(req,res)=>{
+
+  vendorHelpers.addCoupon(req).then((response)=>{
+    if (response.couponExist) {
+      req.session.couponExist = true
+      res.redirect('/admin/coupon')
+    } else {
+   
+      res.redirect('/admin/coupon');
+    }
+  })
+})
+
+// view all available coupons
+
+router.get('/view-all-coupon',async(req,res)=>{
+   await adminHelpers.getAllCoupon().then((data)=>{
+    res.render('admin/view-coupons',{adminLogin: true,data:data})
+  })
+
+})
+
 
 
 

@@ -1,0 +1,143 @@
+<!-- Category -->
+<div class="viewProducts float-right mr-3">
+    <a href="/admin/view-all-coupon" type="button" class="btn btn-primary">View All Coupon</a>
+</div>
+<div class="orders mt-5 p-5">
+    <div class="row">
+        <div class="col-xl-11 mx-auto category-top">
+            <div class="card">
+                <div class="full_container">
+                    <div class="inner_container">
+                        <!-- dashboard inner -->
+                        <h2 class="text-center mt-5 pt-5">Add Coupon</h2>
+                        <div class="w-75 mx-auto mt-5">
+                            <form class="p-5 border mb-5" action="/admin/coupon" method="POST">
+                                <div class="form-group">
+                                    <label for="inputProduct4">Coupon Code</label>
+                                    <input type="text" required class="form-control inpfield" name="couponCode">
+                                </div>
+
+                                <div class="form-group"> 
+                                    <label for="inputProduct4">Description</label>
+                                    <input type="text" id="defaultRegisterFormEmail" class="form-control"
+                                        name="description">
+                                </div>
+                                <div class="form-row mb-3">
+
+                                    <div class="form group col-md-6">
+                                        <label for="inputBrand4">Coupon Type</label>
+                                        <select name="couponType" class="form-control " >
+                                            <option value="none" selected>Choose Coupon type</option>
+                                            <option value="Percentage Discount">Percentage Discount</option>
+                                            <option value="Amount Discount">Amount Discount</option>
+                                          
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label for="inputBrand4">Coupon Value</label>
+                                        <input type="text" required class="form-control inpfield" name="couponValue">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <div class="form-group col-md-6">
+
+                                        <label for="inputStock4">Coupon Valid : From</label><br>
+
+                                        <input type="text" placeholder="DD-MM-YYYY" onfocus="(this.type='date')"  class="form-control inpfield" name="couponValidFrom">
+                                    </div>
+                                    <div class="form-group col-md-6">
+
+                                        <label for="inputPricek4">To</label>
+                                        <input type="text" placeholder="DD-MM-YYYY "  onfocus="(this.type='date')" required class="form-control inpfield" name="couponValidTo">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-row mb-3">
+
+                                    <div class="form-group col-md-6">
+                                        <label for="inputBrand4">Minimum Purchase Amount </label>
+                                        <input type="text" required class="form-control inpfield" name="minValue">
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label for="inputBrand4">Maximum Purchase Amount </label>
+                                        <input type="text" required class="form-control inpfield" name="maxVAlue">
+                                    </div>
+
+                                </div>
+
+                                 <div class="form-row mb-3">
+
+                                    <div class="form-group col-md-6">
+                                        <label for="inputBrand4">Usage limit for the coupon </label>
+                                        <input type="text" required class="form-control inpfield" name="limit">
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label for="inputBrand4">No of times the user can use this discount </label>
+                                        <input type="text" required class="form-control inpfield" name="couponUsageLimit">
+                                    </div>
+
+
+                                </div>                 
+                             <div class="text-center mt-5">
+                                    <button type="submit" class="btn btn-primary">Add Coupon</button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+                        <!-- end dashboard inner -->
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /.card -->
+    </div> <!-- /.col-lg-8 -->
+</div>
+</div>
+<!-- /.Category -->
+{{!-- <script>
+    function previewBeforeUpload(id) {
+        document.querySelector("#" + id).addEventListener("change", function (e) {
+            if (e.target.files.length == 0) {
+                return;
+            }
+            let file = e.target.files[0];
+            let url = URL.createObjectURL(file);
+            document.querySelector("#" + id + "-preview div").innerText = file.name;
+            document.querySelector("#" + id + "-preview img").src = url;
+        });
+    }
+
+    previewBeforeUpload("file-1");
+    previewBeforeUpload("file-2");
+    previewBeforeUpload("file-3");
+    previewBeforeUpload("file-4");
+</script> --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+<script src="sweetalert2/dist/sweetalert2.all.min.js"></script>
+<!-- Include a polyfill for ES6 Promises (optional) for IE11 -->
+<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+
+{{#if couponExist}}
+
+<script>
+    flash()
+    function flash() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'This coupon already exists..',
+        })
+    }
+
+</script>
+
+{{/if}}

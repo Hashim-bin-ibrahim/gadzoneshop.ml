@@ -8,12 +8,17 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-   <title>Vendors</title>
-   {{!--  --}}
-  
- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
-  
+  <title>Vendors</title>
+  {{!-- --}}
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+
+
   <link rel="stylesheet" href="/vendor/css/tablestyle.css">
   <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.css">
   <link href="/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -27,9 +32,9 @@
     <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
         <div class="sidebar-brand-icon">
-        
+
         </div>
-         {{#if vendorId}}
+        {{#if vendorId}}
         <div class="sidebar-brand-text mx-3">{{vendorId.name}}</div>
         {{else }}
         <div class="sidebar-brand-text mx-3">Vendor</div>
@@ -54,13 +59,13 @@
         <div id="collapseBootstrap" class="collapse" aria-labelledby="headingBootstrap" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage products</h6>
-              <a class="collapse-item" href="/vendor/add-new-cat">Add New Category</a>
-              <a class="collapse-item" href="/vendor/active-cat">Active categories</a>
-              <a class="collapse-item" href="/vendor/blocked-cat">Blocked categories</a>
-              <div class="dropdown-divider"></div>
-              <a class="collapse-item" href="/vendor/add-product">Add Products</a>
-              <a class="collapse-item" href="/vendor/view-poducts">View All Products</a>
-              <a class="collapse-item" href="/vendor/blocked-products">Blocked Products</a>
+            <a class="collapse-item" href="/vendor/add-new-cat">Add New Category</a>
+            <a class="collapse-item" href="/vendor/active-cat">Active categories</a>
+            <a class="collapse-item" href="/vendor/blocked-cat">Blocked categories</a>
+            <div class="dropdown-divider"></div>
+            <a class="collapse-item" href="/vendor/add-product">Add Products</a>
+            <a class="collapse-item" href="/vendor/view-poducts">View All Products</a>
+            <a class="collapse-item" href="/vendor/blocked-products">Blocked Products</a>
           </div>
         </div>
       </li>
@@ -73,11 +78,13 @@
         <div id="collapseForm" class="collapse" aria-labelledby="headingForm" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage Users</h6>
-            <a class="collapse-item" href="/admin/user">User Details</a>
-   
+            <a class="collapse-item" href="/vendor/users_list">User Details</a>
+
           </div>
         </div>
+        
       </li>
+      
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="true"
           aria-controls="collapseTable">
@@ -87,15 +94,15 @@
         <div id="collapseTable" class="collapse" aria-labelledby="headingTable" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage Orders</h6>
-           
-            <a class="collapse-item" href="datatables.html">Orders</a>
+
+            <a class="collapse-item" href="/vendor/order_list">Orders</a>
           </div>
         </div>
       </li>
-      {{!-- <li class="nav-item">
-        <a class="nav-link" href="ui-colors.html">
-          <i class="fas fa-fw fa-palette"></i>
-          <span>UI Colors</span>
+       <li class="nav-item">
+        <a class="nav-link" href="/vendor/coupon">
+          <i class="fab fa-fw fa-wpforms"></i>
+          <span>Coupon Management</span>
         </a>
       </li>
       <hr class="sidebar-divider">
@@ -107,8 +114,8 @@
           aria-controls="collapsePage">
           <i class="fas fa-fw fa-columns"></i>
           <span>Pages</span>
-        </a> --}}
-        {{!-- <div id="collapsePage" class="collapse" aria-labelledby="headingPage" data-parent="#accordionSidebar">
+        </a> 
+        <div id="collapsePage" class="collapse" aria-labelledby="headingPage" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Example Pages</h6>
             <a class="collapse-item" href="login.html">Login</a>
@@ -117,7 +124,7 @@
             <a class="collapse-item" href="blank.html">Blank Page</a>
           </div>
         </div>
-      </li> --}}
+      </li>
       {{!-- <li class="nav-item">
         <a class="nav-link" href="charts.html">
           <i class="fas fa-fw fa-chart-area"></i>
@@ -145,8 +152,9 @@
                 aria-labelledby="searchDropdown">
                 <form class="navbar-search">
                   <div class="input-group">
-                    <input type="text" class="form-control bg-light border-1 small" placeholder="What do you want to look for?"
-                      aria-label="Search" aria-describedby="basic-addon2" style="border-color: #3f51b5;">
+                    <input type="text" class="form-control bg-light border-1 small"
+                      placeholder="What do you want to look for?" aria-label="Search" aria-describedby="basic-addon2"
+                      style="border-color: #3f51b5;">
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="button">
                         <i class="fas fa-search fa-sm"></i>
@@ -243,16 +251,16 @@
               <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-tasks fa-fw"></i>
-                
+
               </a>
               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
-              
+
                 <a class="dropdown-item " href="/vendor/logout">Logout</a>
               </div>
             </li>
-           
+
             <li class="nav-item dropdown no-arrow">
-              
+
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="#">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>

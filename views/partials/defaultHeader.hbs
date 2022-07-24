@@ -1,25 +1,27 @@
-{{!-- <!DOCTYPE html>
+{{!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-  <link rel="stylesheet" href="/default/stylesheet.css">
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <link rel="stylesheet" href="/default/stylesheet.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  
- 
-  <title>Ashion</title>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
-      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
 
-  <link href="/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-  <link href="/admin/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="/admin/css/ruang-admin.min.css" rel="stylesheet">
+
+    <title>Ashion</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+
+    <link href="/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="/admin/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/admin/css/ruang-admin.min.css" rel="stylesheet">
 </head> --}}
 
 <!DOCTYPE html>
@@ -36,9 +38,15 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+        rel="stylesheet">
+
+
+
 
     <!-- Css Styles -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.6.0/tiny-slider.css">
+    <link rel="stylesheet" href="node_modules/sweetalert2/dist/sweetalert2.css">
     <link rel="stylesheet" href="/user/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/user/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/user/css/elegant-icons.css" type="text/css">
@@ -50,7 +58,8 @@
 </head>
 
 <body>
-    {{!-- <!-- Page Preloder -->
+    {{!--
+    <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
     </div> --}}
@@ -62,11 +71,11 @@
         <ul class="offcanvas__widget">
             <li><span class="icon_search search-switch"></span></li>
             <li><a href="#"><span class="icon_heart_alt"></span>
-                <div class="tip">2</div>
-            </a></li>
+                    <div class="tip">2</div>
+                </a></li>
             <li><a href="#"><span class="icon_bag_alt"></span>
-                <div class="tip">2</div>
-            </a></li>
+                    <div class="tip">2</div>
+                </a></li>
         </ul>
         <div class="offcanvas__logo">
             <a href="./index.html"><img src="/user/img/logo.png" alt=""></a>
@@ -92,44 +101,48 @@
                     <nav class="header__menu">
                         <ul>
                             <li class="active"><a href="/">Home</a></li>
-                            <li><a href="/mobiles">MOBILES</a></li>
-                            <li><a href="#">LAPTOPS</a></li>
-                            <li><a href="#">TABLETS</a></li>
-                            <li><a href="#">ACCESSORIES</a></li>
+                            <li><a href="/products/mobile phone">MOBILES</a></li>
+                            <li><a href="/products/laptop">LAPTOPS</a></li>
+                            <li><a href="/products/tablets">TABLETS</a></li>
+                           
                             <li><a href="#">OTHER</a>
                                 <ul class="dropdown">
                                     {{#each avlcat}}
                                     <li><a href="/products/{{this._id}}">{{this._id}}</a></li>
-                                  {{/each}}
+                                    {{/each}}
                                 </ul>
-                             
+
                             </li>
-                             
-                              <li><a href="./shop.html">SHOP</a></li>
-                         
+
+                           
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3">
                     <div class="header__right">
+                        
+                        <ul class="header__right__widget">
+                            <li><span class="icon_search search-switch"></span></li>
+                            <li><a href="#"><span class="icon_heart_alt"></span>
+                                    <div class="tip">2</div>
+                                </a></li>
+                            <li id="cart-count"><a href="/cart"><span class="icon_bag_alt "></span>
+                                    <div class="tip">{{cartCount}}</div>
+                                </a></li>
+                                <a  class="profile_icon" href="/my_profile"><i class="fa fa-user"></i></a>
+                        </ul>
                         <div class="header__right__auth">
                             {{#if userDetails}}
                             <a href="/logout">Logout</a>
                             {{else}}
-                             <a href="/login">Login</a>   
-                             {{/if}}                         
+                            <a href="/login">Login</a>
+                            {{/if}}
 
                         </div>
-                        <ul class="header__right__widget">
-                            <li><span class="icon_search search-switch"></span></li>
-                            <li><a href="#"><span class="icon_heart_alt"></span>
-                                <div class="tip">2</div>
-                            </a></li>
-                            <li id="cart-count"><a href="/cart"><span class="icon_bag_alt " ></span>
-                                <div class="tip">{{cartCount}}</div>
-                            </a></li>
-                        </ul>
-                    </div>   
+                        {{!-- <div class="header__top__right__auth">
+                            
+                        </div> --}}
+                    </div>
                 </div>
             </div>
             <div class="canvas__open">

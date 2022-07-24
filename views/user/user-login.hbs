@@ -1,9 +1,9 @@
 <section class="vh-100" style="background-color:white;">
-  <form action="/login" method="post" id="vendor_login" >
+  <form action="/login" method="post" id="user_login" >
     <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-        <div class="dash-container border border-danger" style="border-radius: 1rem;">
+        <div class="dash-container border border-danger" style="border-radius:1rem;">
           <div class="card-body p-5 text-center">
 
             <h3 class="mb-5">User Sign in</h3>
@@ -19,6 +19,10 @@
               <input type="password" minlength="3" required name="password" class="form-control form-control-lg" />
               
             </div>
+            {{#if loginErr}}
+
+            <p class="text-danger">incorrect Email or password</p>
+            {{/if}}
 
            
 
@@ -38,7 +42,7 @@
 
   </form>
   <script>
-  $("#vendor_login").validate();
+  $("#user_login").validate();
 </script>
   
 </section>

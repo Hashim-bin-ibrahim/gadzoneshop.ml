@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb__links">
-                    <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                    <a href="/"><i class="fa fa-home"></i> Home</a>
                     <span>Shopping cart</span>
                 </div>
             </div>
@@ -15,9 +15,10 @@
 
 <!-- Shop Cart Section Begin -->
 <section class="shop-cart spad">
+
     <div class="container" id="cartContainer">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-12 mb-4 shadow">
                 <div class="shop__cart__table">
                     <table>
                         <thead>
@@ -48,106 +49,38 @@
                                     </div>
                                 </td>
 
-                                <td class="cart__price" ><span>$</span> <span id="productPrice{{this.cartItems.product}}">{{this.productLookup.price}}</span></td>
+                                <td class="cart__price"><span
+                                        id="productPrice{{this.cartItems.product}}">{{this.productLookup.price}}</span>
+                                </td>
                                 <td class="cart__quantity">
-                            
+
                                     <div class="quantity">
-                                        <button class="btn minus-btn mr-3" onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',-1,'{{this.productLookup.price}}','update')" >-</button>
-                                       <span id="quantity{{this.cartItems.product}}">{{this.cartItems.quantity}}</span>
-                                        <button class="btn minus-btn ml-3" onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',1,'{{this.productLookup.price}}','update')" >+</button>
+                                        <button class="btn minus-btn mr-3"
+                                            onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',-1,'{{this.productLookup.price}}','update')">-</button>
+                                        <span id="quantity{{this.cartItems.product}}">{{this.cartItems.quantity}}</span>
+                                        <button class="btn minus-btn ml-3"
+                                            onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',1,'{{this.productLookup.price}}','update')">+</button>
                                     </div>
                                 </td>
                                 <td class="cart__total" id="total{{this.cartItems.product}}">{{this.total}}</td>
-                                <td class="cart__close"><button class="cart-remove-btn" onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',-1,'{{this.productLookup.price}}','delete')"><span class="icon_close"></span></button></td>
+                                <td class="cart__close"><button class="cart-remove-btn mr-5"
+                                        onclick="changeQuantity('{{this._id}}','{{this.cartItems.product}}',-1,'{{this.productLookup.price}}','delete')"><span
+                                            class="icon_close "></span></button></td>
                             </tr>
                             {{/each}}
-                        
 
-                            {{!-- <script>
-                                function changeQuantity(cartId,proId,count){
-                                    alert("hiiiiiiiiiii")
-                                    let quantity = parseInt(document.getElementById(`quantity${proId}`).innerText)
-                                    count = parseInt(count)
-                                 
-                                    
-                                    $.ajax({
-                                        
-                                        url :'/change-product-quantity',
-                                        data : {
-                                            cart : cartId,
-                                            product : proId,
-                                            count : count , 
-                                            quantity : quantity
-                                        },2
-                                        method :'post',
-                                        success:(response)=>{
-                                    
-                                            if(response.removeProduct){
-                                                $(`#cart-row${proId}`).remove()
-                                            }else{
-                                                document.getElementById(`quantity${proId}`).innerHTML = quantity+count
-                                            }
-                                        }
-                                    })
+                            {{!-- sweet alert starts --}}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+                            <script src="sweetalert2/dist/sweetalert2.all.min.js"></script>
+                            <!-- Include a polyfill for ES6 Promises (optional) for IE11 -->
+                            <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
 
-                                }
-                            </script> --}}
-
-                            {{!-- <script>
-                                //setting default attribute to disabled of minus button
-                                document.querySelector(".minus-btn").setAttribute("disabled", "disabled");
-
-                                //taking value to increment decrement input value
-                                var valueCount
-
-                                //taking price value in variable
-                                var pprice = document.getElementById("productPrice").innerText;
-                                var price = parseInt(pprice)
-                                //price calculation function
-                                function priceTotal() {
-                                    var total = valueCount * price;
-                                    document.getElementById("totalPrice").innerText = total
-                                }
-
-                                //plus button
-                                document.querySelector(".plus-btn").addEventListener("click", function () {
-                                    //getting value of input
-                                    valueCount =parseInt( document.getElementById("quantity").value);
-
-                                    //input value increment by 1
-                                    valueCount++;
-
-                                    //setting increment input value
-                                    document.getElementById("quantity").value = valueCount;
-
-                                    if (valueCount > 1) {
-                                        document.querySelector(".minus-btn").removeAttribute("disabled");
-                                        document.querySelector(".minus-btn").classList.remove("disabled")
-                                    }
-
-                                    //calling price function
-                                    priceTotal()
-                                })
-
-                                //plus button
-                                document.querySelector(".minus-btn").addEventListener("click", function () {
-                                    //getting value of input
-                                    valueCount = document.getElementById("quantity").value;
-
-                                    //input value increment by 1
-                                    valueCount--;
-
-                                    //setting increment input value
-                                    document.getElementById("quantity").value = valueCount
-
-                                    if (valueCount == 1) {
-                                        document.querySelector(".minus-btn").setAttribute("disabled", "disabled")
-                                    }
-
-                                    //calling price function
-                                    priceTotal()
-                                })
-                            </script> --}}
+                            <script>
+                                swal("Are you sure you want to do this?", {
+                                    buttons: ["Oh noez!", true],
+                                });
+                            </script>
+                            
 
                         </tbody>
                     </table>
@@ -157,7 +90,7 @@
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="cart__btn">
-                    <a href="#">Continue Shopping</a>
+                    <a href="/">Continue Shopping</a>
                 </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6">
@@ -168,27 +101,36 @@
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <div class="discount__content">
+                {{!-- <div class="discount__content">
                     <h6>Discount codes</h6>
                     <form action="#">
                         <input type="text" placeholder="Enter your coupon code">
                         <button type="submit" class="site-btn">Apply</button>
                     </form>
-                </div>
+                </div> --}}
             </div>
-            <div class="col-lg-4 offset-lg-2">
-                <div class="cart__total__procced">
-                    <h6>Cart total</h6>
-                    <ul>
-                
-                        <li>Subtotal <span id="subTotal">{{cartSum.[0].subTotal}}</span><span class="mr-3">$</span> </li>
-                        {{!-- <li>Total <span>$ {{this.subTotal}}</span></li> --}}
-                        
-                    </ul>
-                    <a href="#" class="primary-btn">Proceed to checkout</a>
-                </div>
+
+            <div class="col-lg-4 offset-lg-2" >
+                <form action="/checkOut-post" method="post" id="div_subtotal">
+                    <div class="cart__total__procced">
+                        <h6>Cart total</h6>
+                        <ul>
+
+                            <li>Subtotal <span id="subTotal">{{cartSum.[0].subTotal}}</span> </li>
+                           
+                            <input type="text" id="subtotalAmount" name="cartSum" value="{{cartSum.[0].subTotal}}" hidden>
+                        </ul>
+                        <button type="submit" class="proceed_to_checkout">
+                            Proceed to checkout
+                        </button>
+
+                    </div>
+                </form>
             </div>
+
+
         </div>
     </div>
+
 </section>
 <!-- Shop Cart Section End -->

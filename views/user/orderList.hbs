@@ -1,0 +1,80 @@
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="/"><i class="fa fa-home"></i> Home</a>
+                    <span>Order List</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Shop Cart Section Begin -->
+<section class="shop-cart spad">
+    <div class="container " id="cartContainer">
+        <div class="row ">
+            <div class="col-lg-12 shadow">
+                <div class="shop__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>images</th>
+                                <th>Item</th>
+                                <th>Amount</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                {{!-- <th>Status</th> --}}
+                                <th></th>
+                            </tr>
+                        </thead>
+                        {{!-- class="orderTable" --}}
+                        <tbody>
+                            {{#each orderPro}}
+
+                            <tr>
+                                <td>
+                                    <img style="width: 100px; height:auto;"
+                                        src="/productimages/{{this.productLookup.productPictures.filename}}"
+                                        class="img-fluid" alt="Phone">
+                                </td>
+                                <td>{{this.productLookup.name}}</td>
+                                {{!-- <td>{{this.address.address1}},<br>
+                                    {{this.address.address2}}<br>
+                                    {{this.address.city}},<br>
+                                    {{this.address.state}},<br>
+                                    {{this.address.zip}}</td> --}}
+                                {{!-- <td>{{this.address.phoneNumber}}</td> --}}
+                                <td>{{this.productLookup.price}}</td>
+                                <td>{{this.paymentType}}</td>
+                                <td>{{this.products.orderStatus}}</td>
+                                {{!-- <td>{{this.orderStatus}}</td> --}}
+                                <td>
+                                    <a href="/ordered-pro-details?productId={{this.productLookup._id}}&orderId={{this._id}}"
+                                        class="btn btn-primary">View Products</a>
+                                </td>
+
+                            </tr>
+                            {{/each}}
+
+                            {{!-- sweet alert starts --}}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+                            <script src="sweetalert2/dist/sweetalert2.all.min.js"></script>
+                            <!-- Include a polyfill for ES6 Promises (optional) for IE11 -->
+                            <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+
+                            <script>
+                                swal("Are you sure you want to do this?", {
+                                    buttons: ["Oh noez!", true],
+                                });
+                            </script>
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>

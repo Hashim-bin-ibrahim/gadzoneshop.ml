@@ -1441,6 +1441,12 @@ a:focus {
     padding: 15px;
 }
 
+.viewProducts{
+  float: right;
+  margin-top: 5px;
+  margin-right: 20px;
+}
+
 .form-control{
   font-size: 1rem !important;
 }

@@ -3,6 +3,7 @@ const category = require('../models/category')
 const { resolve } = require('path')
 const async = require('hbs/lib/async')
 const vendor = require('../models/vendor')
+const coupon = require('../models/coupon')
 var objectId = require('mongodb').ObjectId
 
 module.exports={
@@ -141,9 +142,34 @@ holdVen :(venId)=>{
             })
            
         })
+    },
+
+
+    getAllCoupon :()=>{
+        return new Promise(async(resolve,reject)=>{
+          let availCoupon =   await coupon.aggregate([
+                {
+                  '$project': {
+
+                    couponCode:1,
+                    description:1,
+                    minValue : 1,
+                    couponType :1,
+                    couponValue:1,
+                    maxVAlue :1,
+                    limit:1,
+                    couponUsageLimit :1,
+                    couponValidFrom :{$dateToString:{format:"%Y-%m-%d", date: '$couponValidFrom'}},
+                    couponValidTo :{$dateToString:{format:"%Y-%m-%d", date: '$couponValidTo'}}
+
+
+                  }
+                }
+              ])
+             
+              resolve(availCoupon)
+        })
     }
-
-
 
 // updateUser:(userId,userDetails)=>{
 //     return new Promise((resolve,reject)=>{

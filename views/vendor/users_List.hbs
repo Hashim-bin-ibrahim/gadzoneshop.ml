@@ -1,0 +1,74 @@
+{{!-- SHOW ALL CATEGORY LIST STARTS--}}
+<div class="dash-container  mt-5 p-4">
+  <h4 class="text-center mb-5">View all orders</h4>
+  <section>
+
+    <div class="container shadow p-2">
+
+      <table class="table" id="vendors_table">
+
+
+
+
+        <thead>
+          <tr style="align-items: center;">
+            <th>Sl No</th>
+         
+            <th>name</th>
+            <th>email</th>
+           
+            <th>phone</th>
+            <th>address</th>
+            <th> block</th>
+            
+            
+          
+          </tr>
+        </thead>
+
+        <tbody>
+          {{#each data}}
+          <tr>
+
+            <td>{{inc @index}}</td>
+             {{!-- <td>
+                                    <img style="width: 100px; height:auto;" src="/productimages/{{this.productLookup.productPictures.filename}}"
+                                        class="img-fluid" alt="Phone">
+                                </td> --}}
+            <td> {{this.usersLookup.name}}</td>
+            <td> {{this.usersLookup.email}}</td>
+             <td> {{this.usersLookup.phoneNumber}}</td>
+            <td> {{this.usersLookup.address.[0].address1}},{{this.usersLookup.address.[0].address2}}<br>
+            {{this.usersLookup.address.[0].state}},{{this.usersLookup.address.[0].city}}<br>
+            {{this.usersLookup.address.[0].zip}}
+            </td>
+            <td>
+                
+            </td>
+            
+          </tr>
+
+          {{/each}}
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+
+
+
+
+<script>
+  $(document).ready(function () {
+
+
+    $('#user_table').wrap('<div id="hide" style="display:none"/>');
+
+    $('#hide').css('display', 'block');
+  });
+
+
+  var table = $('#vendors_table').DataTable();
+</script>

@@ -28,6 +28,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         
     },
+    quantity :{
+        type :Number,
+        default :1
+    },
     sale: {
         type: String,
         
