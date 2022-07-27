@@ -1,4 +1,10 @@
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
+    <!-- Jquery Validation -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.js"></script>
         <section class="vh-100 bg-image pt-5 pb-5"
             style="background-color:white;">
             <div class="mask d-flex align-items-center h-100 gradient-custom-3">
@@ -57,9 +63,7 @@
                                         </div>
 
                                     </form>
-                                     <script>
-                                         $("#vendor_login").validate();
-                                    </script>
+                                 
 
                                 </div>
                             </div>
@@ -68,3 +72,52 @@
                 </div>
             </div>
         </section>
+
+
+    <script>
+jQuery.validator.addMethod("lettersonly", function (value, element) {
+        return this.optional(element) || /^[a-z]+$/i.test(value);
+    }, "Letters only please");
+
+    $.validator.addMethod("noCaps", function (value, element) {
+        return this.optional(element) || !/[A-Z]/.test(value);
+    }, "email can't have upper case letters")
+
+
+    $("#vendor_login").validate({
+      errorClass: "valierrors",
+  
+      rules:{
+        name:{
+          required:true,
+          minlength:3,
+          lettersonly:true
+        },
+  
+        email:{
+          required:true,
+          email:true,
+          noCaps:true
+        },
+  
+        phone:{
+          required:true,
+          minlength:10
+        },
+  
+        password:{
+          required:true,
+          minlength: 5
+        },
+        con_password:{
+            required:true,
+            equalTo:'#password'
+        }
+      },
+      messages:{
+        con_password:{
+          equalTo:"Passwords are not match"
+        }
+      }
+    })
+    </script>

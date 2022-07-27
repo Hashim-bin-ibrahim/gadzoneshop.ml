@@ -50,24 +50,21 @@
 
                     {{#if orderData.[0].products.delivered}}
                     <span style="color: green;">order delivered</span>
+                    {{else if  orderData.[0].products.cancelled}}
+                    <h5 style="color: red;">
+                      Order Cancelled
+                    </h5>
                     {{else}}
                      <button class="site-btn" onclick="cancelOrder('{{orderData.[0]._id}}','{{proDetails.[0]._id}}')">
                       Cancel Order
                     </button>
                     {{/if}}
 
-                  
-                   
-                   
-
 
                   </div>
 
 
                 </div>
-
-
-
               </div>
               <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;">
 

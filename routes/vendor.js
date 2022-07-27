@@ -7,6 +7,7 @@ var adminHelpers = require('../helpers/admin-helpers')
 const userHelper = require('../helpers/user-helpers')
 var sms = require('../config/verify');
 const store = require('../public/middleware/multer');
+const async = require('hbs/lib/async');
 
 
 
@@ -27,11 +28,26 @@ router.get('/', (req, res) => {
   }
 })
 
-router.get('/vendor-dash', (req, res) => {
+router.get('/vendor-dash',async (req, res) => {
+  let renderdata = {}
   if (req.session.vendorLogiin) {
     res.header('Cache-control', 'no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
     const vendorId = req.session.vendorDetails
-    res.render('vendor/vendor-dashboard', { vendorId: vendorId, vendorLogin: true })
+    let daily_earning = await adminHelpers.dailyEarning(vendorId)
+    let payment_Data = await adminHelpers.getRevenue(vendorId)
+    let sales = await adminHelpers.dailySales(vendorId)
+    let users = await adminHelpers.totalUsers(vendorId)
+
+    renderdata.sales = sales
+    renderdata.users = users
+    renderdata.daily_earning = daily_earning,
+      renderdata.payment_Data = payment_Data
+    renderdata.vendorLogin = true
+    renderdata.vendorId = vendorId
+
+
+
+    res.render('vendor/vendor-dashboard',renderdata)
   } else {
     res.redirect('/vendor')
   }
@@ -367,9 +383,6 @@ router.post('/status_delivered',(req,res)=>{
 
 router.post('/status_cancelled',(req,res)=>{
   let {order_Id,product_Id}=req.body
-
-  console.log(order_Id);
-  console.log(product_Id);
   vendorHelper.cancelProduct(order_Id,product_Id).then((response)=>{
   
     if(response){

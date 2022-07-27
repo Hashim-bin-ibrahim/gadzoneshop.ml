@@ -4,6 +4,7 @@ const category = require('../models/category')
 const user = require('../models/user')
 var bcrypt = require('bcrypt')
 const coupon = require('../models/coupon')
+
 const product = require('../models/product')
 const order = require('../models/order')
 const cart = require('../models/cart')
@@ -13,6 +14,7 @@ const Razorpay = require('razorpay');
 const { resolve } = require('path')
 const async = require('hbs/lib/async')
 const { response } = require('../app')
+const wishlist = require('../models/wishlist')
 
 
 
@@ -79,88 +81,192 @@ module.exports = {
   },
 
   addToCart: (proId, userId, qnty) => {
-  
+
     return new Promise(async (resolve, reject) => {
       let response = {}
-      let productStock = await product.findOne({_id:objectId(proId)})
-         
-        if(productStock.stock != 0){        
-      let userCart = await cart.findOne({ user: userId })
-      if (userCart) {
-        let productIn = await userCart.cartItems.find(c => c.product == proId)
-        
-        if (productIn) {
-          let productExist = await cart.updateOne
-            (
-              { "user": userId, "cartItems.product": proId },
-              {
+      let productStock = await product.findOne({ _id: objectId(proId) })
 
-                "$set": { "cartItems.$.quantity": parseInt(productIn.quantity) + qnty },
+      if (productStock.stock != 0) {
+        let userCart = await cart.findOne({ user: userId })
+        if (userCart) {
+          let productIn = await userCart.cartItems.find(c => c.product == proId)
+
+          if (productIn) {
+            let productExist = await cart.updateOne
+              (
+                { "user": userId, "cartItems.product": proId },
+                {
+
+                  "$set": { "cartItems.$.quantity": parseInt(productIn.quantity) + qnty },
+                }
+              )
+            resolve(productExist)
+
+          } else {
+
+            const newCartPro = await cart.updateOne({ user: objectId(userId) },
+              {
+                $push: { cartItems: { product: objectId(proId), quantity: qnty } },
+
               }
             )
-          resolve(productExist)
+            resolve(newCartPro)
+          }
 
-        } else {
-
-          const newCartPro = await cart.updateOne({ user: objectId(userId) },
-            {
-              $push: { cartItems: { product: objectId(proId), quantity: qnty } },
-
-            }
-          )
-          resolve(newCartPro)
         }
+        else {
 
+          let cartObj = new cart({
+            user: objectId(userId),
+            cartItems: [
+              { product: [objectId(proId)] }
+            ]
+
+          })
+          await cartObj.save().then((response) => {
+            response.cartObj = cartObj
+
+            resolve(response)
+          })
+        }
+      } else {
+        response.stockOut = true,
+          console.log("stooooooooooooooooock out.......................................");
+        resolve(response)
       }
-      else {
+    })
+  },
+  add_To_Cart_frm_wishlst: (proId, userId, qnty) => {
+    return new Promise(async (resolve, reject) => {
+      let response = {}
+      let productStock = await product.findOne({ _id: objectId(proId) })
 
-        let cartObj = new cart({
-          user: objectId(userId),
-          cartItems: [
-            { product: [objectId(proId)] }
-          ]
+      if (productStock.stock != 0) {
+        let userCart = await cart.findOne({ user: userId })
+        if (userCart) {
+          let productIn = await userCart.cartItems.find(c => c.product == proId)
 
-        })
-        await cartObj.save().then((response) => {
-          response.cartObj = cartObj
+          if (productIn) {
+            let productExist = await cart.updateOne
+              (
+                { "user": userId, "cartItems.product": proId },
+                {
 
-          resolve(response)
-        })
+                  "$set": { "cartItems.$.quantity": parseInt(productIn.quantity) + qnty },
+                }
+              )
+            resolve(productExist)
+
+          } else {
+            const newCartPro = await cart.updateOne({ user: objectId(userId) },
+              {
+                $push: { cartItems: { product: objectId(proId), quantity: qnty } },
+
+              }
+            )
+            resolve(newCartPro)
+
+          }
+        }
+        else {
+
+          let cartObj = new cart({
+            user: objectId(userId),
+            cartItems: [
+              { product: [objectId(proId)] }
+            ]
+
+          })
+          await cartObj.save().then((response) => {
+            response.cartObj = cartObj
+
+            resolve(response)
+          })
+        }
+      } else {
+        response.stockOut = true,
+          console.log("stooooooooooooooooock out.......................................");
+        resolve(response)
       }
-    }else{
-      response.stockOut = true,
-      console.log("stooooooooooooooooock out.......................................");
-      resolve(response)
-    }
     })
   },
 
 
+  addToWishlist: (proId, userId) => {
+
+    console.log(proId, userId);
+
+    return new Promise(async (resolve, reject) => {
+      let response = {}
+      let productDetails = await product.findOne({ _id: objectId(proId) })
+      if (productDetails.stock != 0) {
+        let userWishlist = await wishlist.findOne({ user: userId })
+        if (userWishlist) {
+          const newWishedPro = await wishlist.updateOne({ user: objectId(userId) },
+            {
+              $push: { wishedItems : { product: objectId(proId) } },
+
+            }
+          )
+          resolve(newWishedPro)
+        }
+        else {
+
+          let wishedobj = new wishlist({
+            user: objectId(userId),
+            wishedItems: [
+              {
+                product: [objectId(proId)],
+                wished: true,
+              }
+
+            ]
+
+          })
+          await wishedobj.save().then((response) => {
+            response.wishedobj = wishedobj
+            resolve(response)
+          })
+        }
+      } else {
+        response.stockOut = true,
+          console.log("stooooooooooooooooock out.......................................");
+        resolve(response)
+      }
+    })
+  },
+
   userAddress: (addressId, userId) => {
     return new Promise(async (resolve, reject) => {
-      let address = await user.aggregate([
-        {
-          '$match': {
-            '_id': objectId(userId)
+      try {
+
+
+        let address = await user.aggregate([
+          {
+            '$match': {
+              '_id': objectId(userId)
+            }
+          }, {
+            '$unwind': {
+              'path': '$address'
+            }
+          }, {
+            '$match': {
+              'address._id': objectId(addressId)
+            }
           }
-        }, {
-          '$unwind': {
-            'path': '$address'
-          }
-        }, {
-          '$match': {
-            'address._id': objectId(addressId)
-          }
-        }
-      ])
-      resolve(address)
+        ])
+        resolve(address)
+      } catch (error) {
+        reject(error)
+      }
 
     })
 
   },
 
   save_Edited_Address: (addressId, addressData) => {
-    
+
     return new Promise(async (resolve, reject) => {
       await user.updateOne({ 'address._id': objectId(addressId) },
         {
@@ -169,9 +275,9 @@ module.exports = {
             'address.$.lastname': addressData.lastname,
             'address.$.country': addressData.country,
             'address.$.address1': addressData.address1,
-           ' address.$.address2': addressData.address2,
+            ' address.$.address2': addressData.address2,
             'address.$.city': addressData.city,
-           ' address.$.state': addressData.state,
+            ' address.$.state': addressData.state,
             'address.$.zip': addressData.zip,
             'address.$.phoneNumber': addressData.phoneNumber,
             'address.$.email': addressData.email,
@@ -350,7 +456,6 @@ module.exports = {
       let userCart = await cart.findOne({ user: objectId(userId) })
       if (userCart) {
         count = userCart.cartItems.length
-
       }
       resolve(count)
     })
@@ -413,36 +518,15 @@ module.exports = {
             resolve(response)
           })
       }
-
     })
-
   },
-  // quantityChange :(details)=>{
-  //     details.quantity = parseInt(details.quantity)
-  //   details.count = parseInt(details.count);
-  //   console.log(details.count+"                                           ocunt");
-  //   return new Promise(async(resolve,reject)=>{
-  //     await product.updateOne({_id:objectId(details.productId)},
-  //     {
-  //       "$set":{"quantity":details.quantity+details.count }
-  //     }).then((response)=>{
-  //       resolve(response)
-  //     })
 
-
-  //   })
-
-  // },
   quantityChange: (details) => {
     details.quantity = parseInt(details.quantity)
     details.count = parseInt(details.count);
-
     return new Promise(async (resolve, reject) => {
-
       resolve(true)
-
     })
-
   },
   productDetails: (proID) => {
     return new Promise(async (resolve, reject) => {
@@ -485,7 +569,7 @@ module.exports = {
       ])
 
       resolve(proDetils)
-      
+
     })
 
   },
@@ -503,13 +587,12 @@ module.exports = {
   placeOrder: async (deliveryDetails, userId, cartSum, carts, paymentMethod, grand_Total) => {
     let productQuantity = carts.cartItems[0].quantity
     let productId = carts.cartItems[0].product
-    let abc =await product.findOne({_id:objectId(productId)})
+    let abc = await product.findOne({ _id: objectId(productId) })
     let stock = abc.stock
-    let currentValue = stock-productQuantity
-    console.log(currentValue,"                                      666666666666666666666666666666666666666666666");
+    let currentValue = stock - productQuantity
 
     return new Promise(async (resolve, reject) => {
-    
+
       const orderObj = {
         user: userId,
         cart: carts._id,
@@ -529,15 +612,15 @@ module.exports = {
         orderObj.paymentStatus = "pending"
       }
 
-      let stockClearing  = await product.updateOne({_id:objectId(productId)},
-      {
-        $set:{
-          stock:currentValue
-        }
+      let stockClearing = await product.updateOne({ _id: objectId(productId) },
+        {
+          $set: {
+            stock: currentValue
+          }
 
-      })
+        })
 
-      
+
 
 
       const newOrder = await order.create(orderObj)
@@ -644,18 +727,14 @@ module.exports = {
           }
         }, {
           '$lookup': {
-            'from': 'products', 
-            'localField': 'products.product', 
-            'foreignField': '_id', 
+            'from': 'products',
+            'localField': 'products.product',
+            'foreignField': '_id',
             'as': 'productLookup'
           }
         }, {
           '$unwind': {
             'path': '$productLookup'
-          }
-        }, {
-          '$unwind': {
-            'path': '$productLookup.productPictures'
           }
         }, {
           '$sort': {
@@ -799,7 +878,7 @@ module.exports = {
   },
   orderDetails: (orderId) => {
     return new Promise(async (resolve, reject) => {
-       
+
       let orderDetails = await order.aggregate([
         {
           '$match': {
@@ -809,20 +888,19 @@ module.exports = {
           '$unwind': {
             'path': '$products'
           }
-        },{
+        }, {
           '$project': {
-              '_id': 1, 
-              'user': 1, 
-              'products': 1, 
-              'totalAmount': 1, 
-              'paymentType': 1, 
-              'cart': 1, 
-              'address': 1, 
-              createdAt: { $dateToString: { format: "%Y-%m-%d", date: '$createdAt' } }
+            '_id': 1,
+            'user': 1,
+            'products': 1,
+            'totalAmount': 1,
+            'paymentType': 1,
+            'cart': 1,
+            'address': 1,
+            createdAt: { $dateToString: { format: "%Y-%m-%d", date: '$createdAt' } }
           }
-      }
+        }
       ])
-     
       resolve(orderDetails)
 
     })
@@ -844,8 +922,6 @@ module.exports = {
             couponUsageLimit: 1,
             couponValidFrom: { $dateToString: { format: "%Y-%m-%d", date: '$couponValidFrom' } },
             couponValidTo: { $dateToString: { format: "%Y-%m-%d", date: '$couponValidTo' } }
-
-
           }
         }
       ])
@@ -908,7 +984,7 @@ module.exports = {
             }
           }
         })
-        
+
 
         response.couponAccess = true
         resolve(response)
@@ -920,7 +996,7 @@ module.exports = {
   },
 
   getAddressDetails: (addressId) => {
-  
+
     return new Promise(async (resolve, reject) => {
       let address = await user.aggregate([
         {
@@ -937,35 +1013,164 @@ module.exports = {
           }
         }
       ])
-      
+
       resolve(address)
 
     })
   },
 
-  brandFilter : (brand_name)=>{
-    return new Promise(async(resolve,reject)=>{
+  brandFilter: (brand_name) => {
+    return new Promise(async (resolve, reject) => {
       await product.aggregate(
         [
           {
-              '$match': {
-                  'brand_name': brand_name
-              }
+            '$match': {
+              'brand_name': brand_name
+            }
           }
-      ]
+        ]
       )
-
-
-    }).then((response)=>{
+    }).then((response) => {
       resolve(response)
     })
+  },
+  wishedItems: (userId) => {
+    return new Promise(async (resolve, reject) => {
+      let wishedItems = await wishlist.aggregate([
+        {
+          '$match': {
+            'user': objectId(userId)
+          }
+        }, {
+          '$unwind': {
+            'path': '$wishedItems'
+          }
+        }, {
+          '$lookup': {
+            'from': 'products',
+            'localField': 'wishedItems.product',
+            'foreignField': '_id',
+            'as': 'productLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$productLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$productLookup.productPictures'
+          }
+        }, {
+          '$lookup': {
+            'from': 'vendors',
+            'localField': 'productLookup.createdBy',
+            'foreignField': '_id',
+            'as': 'vendorLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$vendorLookup'
+          }
+        }
+      ])
+
+      resolve(wishedItems)
+    })
+  },
+
+  delete_product_from_wishlist: (proId) => {
+    let response = {}
+
+    return new Promise(async (resolve, reject) => {
+      let delete_pro = await wishlist.updateOne({ 'wishedItems.product': objectId(proId) },
+        {
+          $pull: { wishedItems:{product: objectId(proId) } }
+        })
+      response.deleted = true
+      response.delete_pro = delete_pro
+      resolve(response)
+    })
+
+  },
+  mobileData : ()=>{
+    return new Promise(async(resolve,reject)=>{
+      let mobiles = await product.aggregate([
+        {
+          '$lookup': {
+            'from': 'categories', 
+            'localField': 'category', 
+            'foreignField': '_id', 
+            'as': 'categoryLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$categoryLookup'
+          }
+        }, {
+          '$match': {
+            'categoryLookup.name': 'mobile phone'
+          }
+        }, {
+          '$limit': 8
+        }
+      ])
+      resolve(mobiles)
+
+
+    })
+  },
+  tabletData : ()=>{
+    return new Promise(async(resolve,reject)=>{
+      let tablets = await product.aggregate([
+        {
+          '$lookup': {
+            'from': 'categories', 
+            'localField': 'category', 
+            'foreignField': '_id', 
+            'as': 'categoryLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$categoryLookup'
+          }
+        }, {
+          '$match': {
+            'categoryLookup.name': 'tablets'
+          }
+        }, {
+          '$limit': 8
+        }
+      ])
+      console.log("kjghndfbsgshfdjgfkhtjlyiujolkiuhbj,gdfxbsbfxdng,jbhnl");
+      resolve(tablets)
+
+
+    })
+  },
+  laptopData : ()=>{
+    return new Promise(async(resolve,reject)=>{
+      let laptops = await product.aggregate([
+        {
+          '$lookup': {
+            'from': 'categories', 
+            'localField': 'category', 
+            'foreignField': '_id', 
+            'as': 'categoryLookup'
+          }
+        }, {
+          '$unwind': {
+            'path': '$categoryLookup'
+          }
+        }, {
+          '$match': {
+            'categoryLookup.name': 'laptop'
+          }
+        }, {
+          '$limit': 8
+        }
+      ])
+      console.log("kjghndfbsgshfdjgfkhtjlyiujolkiuhbj,gdfxbsbfxdng,jbhnl");
+      resolve(laptops)
+    })
   }
-
-
-
 }
-
-
-
-
-

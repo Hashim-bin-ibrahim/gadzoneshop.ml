@@ -1,4 +1,6 @@
  <!-- Container Fluid-->
+   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+
         <div class="container-fluid" id="container-wrapper">
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
@@ -15,7 +17,7 @@
                   <div class="row align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-uppercase mb-1">Earnings (Monthly)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{daily_earning}}</div>
                       <div class="mt-2 mb-0 text-muted text-xs">
                         <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
                         <span>Since last month</span>
@@ -35,7 +37,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-uppercase mb-1">Sales</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">650</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{sales}}</div>
                       <div class="mt-2 mb-0 text-muted text-xs">
                         <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
                         <span>Since last years</span>
@@ -54,8 +56,8 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-uppercase mb-1">New User</div>
-                      <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">366</div>
+                      <div class="text-xs font-weight-bold text-uppercase mb-1"> Users</div>
+                      <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{users}}</div>
                       <div class="mt-2 mb-0 text-muted text-xs">
                         <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 20.4%</span>
                         <span>Since last month</span>
@@ -90,7 +92,7 @@
             </div>
 
             <!-- Area Chart -->
-            <div class="col-xl-8 col-lg-7">
+            <div class="col-xl-6 col-lg-4">
               <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-primary">Monthly Recap Report</h6>
@@ -109,15 +111,17 @@
                     </div>
                   </div>
                 </div>
-                <div class="card-body">
-                  <div class="chart-area">
+
+
+                  
                     <canvas id="myAreaChart"></canvas>
-                  </div>
-                </div>
+                 
+
+
               </div>
             </div>
             <!-- Pie Chart -->
-            <div class="col-xl-4 col-lg-5">
+            <div class="col-xl-4 col-lg-8">
               <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-primary">Products Sold</h6>
@@ -151,7 +155,7 @@
                       <div class="small float-right"><b>500 of 800 Items</b></div>
                     </div>
                     <div class="progress" style="height: 12px;">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 70%" aria-valuenow="70"
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="70"
                         aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                   </div>
@@ -191,7 +195,7 @@
             </div>
            
             <!-- Message From Customer-->
-            <div class="col-xl-4 col-lg-5 ">
+            {{!-- <div class="col-xl-4 col-lg-5 ">
               <div class="card">
                 <div class="card-header py-4 bg-primary d-flex flex-row align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-light">Message From Customer</h6>
@@ -232,7 +236,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> --}}
           </div>
           <!--Row-->
 
@@ -261,3 +265,32 @@
 
         </div>
         <!---Container Fluid--> 
+ <script type="text/javascript"></script>
+         <script>
+       
+
+    var ctx = document.getElementById("myAreaChart").getContext('2d');
+    var myAreaChart = new Chart(ctx, {
+       
+        type: 'bar',
+        data: {
+            labels: ['COD', 'Razorpay'],
+            datasets: [{
+                label: 'Payment methods',
+                data: [{{payment_Data}}],
+            backgroundColor: [
+                'rgba(52, 235, 219, 1)',
+                'rgba(26, 36, 235, 1)',
+                'rgba(227, 14, 78, 1)'
+            ],
+        }]
+    },
+        options: {
+        responsive: true,
+    },
+    
+    });
+
+        </script>
+
+      

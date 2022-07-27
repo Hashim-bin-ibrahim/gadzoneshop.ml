@@ -10,8 +10,11 @@
     {{>vendorHeader}}
     {{else}}{{#if Login}}
     {{>login-header}}
+    {{else}}{{#if error}}
+    {{>errorHeader}}
     {{else}}
     {{>defaultHeader}}
+    {{/if}}
     {{/if}}
     {{/if}}
     {{/if}}
@@ -20,10 +23,13 @@
     {{>admin-footer}}
     {{else}}{{#if vendorLogin}}
     {{>vendorFooter}}
-     {{else}}{{#if Login}}
+    {{else}}{{#if Login}}
     {{>login-footer}}
+    {{else}}{{#if error}}
+    {{>errorFooter}}
     {{else}}
     {{>defaultFooter}}
+    {{/if}}
     {{/if}}
     {{/if}}
     {{/if}}

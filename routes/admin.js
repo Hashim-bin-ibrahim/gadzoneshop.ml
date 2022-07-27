@@ -13,19 +13,19 @@ const passworddb = 123;
 var loginErr = false;
 
 //session checking 
-function adminloggedin(req,res,next){
-  req.session.adminloggedIn ? next():res.redirect('/admin');
+function adminloggedin(req, res, next) {
+  req.session.adminloggedIn ? next() : res.redirect('/admin');
 }
 
 router.get('/', function (req, res) {
   res.header('Cache-control', 'no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
   if (req.session.adminloggedIn) {
     res.redirect('/admin/dashboard');
-  } else{
-    res.render('admin/admin-login', { loginErr: loginErr,Login:true });
+  } else {
+    res.render('admin/admin-login', { loginErr: loginErr, Login: true });
     loginErr = false;
   }
-   
+
 });
 
 
@@ -37,21 +37,21 @@ router.get('/', function (req, res) {
 //   })
 
 // })
-router.get('/new-cat-req',adminloggedin, (req, res) => {
+router.get('/new-cat-req', adminloggedin, (req, res) => {
   adminHelpers.showCategory().then((data) => {
     res.render('admin/new-cat-req', { adminLogin: true, data: data });
   })
 
 })
 //hold category get method
-router.get('/hold-cat',adminloggedin, (req, res) => {
+router.get('/hold-cat', adminloggedin, (req, res) => {
   adminHelpers.holdedCat().then((data) => {
     res.render('admin/hold-cat', { adminLogin: true, data: data })
   })
 
 })
 //edit categories 
-router.get('/edit-cat',adminloggedin, (req, res) => {
+router.get('/edit-cat', adminloggedin, (req, res) => {
   adminHelpers.editCat().then((data) => {
     res.render('admin/edit-cat-req', { adminLogin: true, data: data })
   })
@@ -59,20 +59,33 @@ router.get('/edit-cat',adminloggedin, (req, res) => {
 })
 
 
-
-
 router.get('/admin-verify', (req, res) => {
   res.render('admin/admin-verification')
 })
 
-router.get('/dashboard', (req, res) => {
+
+router.get('/dashboard', async (req, res) => {
+  let renderdata = {}
   if (req.session.adminloggedIn) {
-    res.render('admin/admin-dashboard', { adminLogin: true })
+    let daily_earning = await adminHelpers.dailyEarning()
+    let payment_Data = await adminHelpers.getRevenue()
+    let sales = await adminHelpers.dailySales()
+    let users = await adminHelpers.totalUsers()
+
+    renderdata.sales = sales
+    renderdata.users = users
+    renderdata.daily_earning = daily_earning,
+      renderdata.payment_Data = payment_Data
+    renderdata.adminLogin = true
+    res.render('admin/admin-dashboard', renderdata)
   } else {
     res.redirect('/admin')
   }
 
 })
+
+
+
 //block category from newcat-req
 // router.get('/block-cat/:id',(req,res)=>{
 //   let catId = req.params.id
@@ -90,20 +103,20 @@ router.get('/hold-cat/:id', (req, res) => {
 })
 
 //block category from active category
-router.get('/block-cat/:id',adminloggedin, (req, res) => {
+router.get('/block-cat/:id', adminloggedin, (req, res) => {
   let catId = req.params.id
   adminHelpers.blockCategory(catId).then((response) => {
     res.redirect('/admin/active-cat')
   })
 })
 //show blocked vendors
-router.get('/blocked-ven',adminloggedin,(req,res)=>{
-  vendorHelpers.blockedven().then((data)=>{
-    res.render('admin/blocked-ven',{adminLogin: true,vendors:data})
+router.get('/blocked-ven', adminloggedin, (req, res) => {
+  vendorHelpers.blockedven().then((data) => {
+    res.render('admin/blocked-ven', { adminLogin: true, vendors: data })
   })
 })
 //unblock vendor s from blocked vendors
-router.get('/unblock-ven/:id',adminloggedin, (req, res) => {
+router.get('/unblock-ven/:id', adminloggedin, (req, res) => {
   let catId = req.params.id
   vendorHelpers.unblockVen(catId).then((response) => {
     res.redirect('/admin/blocked-ven')
@@ -112,23 +125,23 @@ router.get('/unblock-ven/:id',adminloggedin, (req, res) => {
 
 
 //block vendor  from active
-router.get('/block-ven/:id',adminloggedin, (req, res) => {
+router.get('/block-ven/:id', adminloggedin, (req, res) => {
   let catId = req.params.id
   vendorHelpers.blockVen(catId)
-    res.redirect('/admin/active-ven')
+  res.redirect('/admin/active-ven')
 
 })
 // show all active vendors
-router.get('/active-ven',(req,res)=>{
-  vendorHelpers.activeVen().then((data)=>{
-    res.render('admin/activeVen',{adminLogin: true,data:data})
+router.get('/active-ven', (req, res) => {
+  vendorHelpers.activeVen().then((data) => {
+    res.render('admin/activeVen', { adminLogin: true, data: data })
   })
 })
 
 //show holded vendors
-router.get('/holded-ven',(req,res)=>{
-  vendorHelpers.holdedVen().then((data)=>{
-    res.render('admin/hold-vendor',{adminLogin: true,vendors:data})
+router.get('/holded-ven', (req, res) => {
+  vendorHelpers.holdedVen().then((data) => {
+    res.render('admin/hold-vendor', { adminLogin: true, vendors: data })
   })
 })
 //hold vendor 
@@ -151,7 +164,7 @@ router.get('/update-cat/:id/:editTo', (req, res) => {
 
 
 //blocked category
-router.get('/blocked-cat',adminloggedin, (req, res) => {
+router.get('/blocked-cat', adminloggedin, (req, res) => {
   adminHelpers.blockedCat().then((data) => {
     res.render('admin/blocked-cat', { adminLogin: true, data: data })
   })
@@ -190,7 +203,7 @@ router.get('/active-cat', (req, res) => {
 })
 
 // view products
-router.get('/view-products',adminloggedin, (req, res) => {
+router.get('/view-products', adminloggedin, (req, res) => {
   vendorHelpers.avlPro().then((data) => {
     console.log(data);
     res.render('admin/view-products', { adminLogin: true, data: data })
@@ -221,21 +234,21 @@ router.post('/otpVerify', (req, res) => {
 })
 
 var couponExist = false
-router.get('/coupon',(req,res)=>{
+router.get('/coupon', (req, res) => {
   couponExist = req.session.couponExist
-  res.render('admin/coupon-create',{adminLogin:true,couponExist:couponExist})
+  res.render('admin/coupon-create', { adminLogin: true, couponExist: couponExist })
   couponExist = false
 })
 
 
-router.post('/coupon',(req,res)=>{
+router.post('/coupon', (req, res) => {
 
-  vendorHelpers.addCoupon(req).then((response)=>{
+  vendorHelpers.addCoupon(req).then((response) => {
     if (response.couponExist) {
       req.session.couponExist = true
       res.redirect('/admin/coupon')
     } else {
-   
+
       res.redirect('/admin/coupon');
     }
   })
@@ -243,30 +256,13 @@ router.post('/coupon',(req,res)=>{
 
 // view all available coupons
 
-router.get('/view-all-coupon',async(req,res)=>{
-   await adminHelpers.getAllCoupon().then((data)=>{
-    res.render('admin/view-coupons',{adminLogin: true,data:data})
+router.get('/view-all-coupon', async (req, res) => {
+  await adminHelpers.getAllCoupon().then((data) => {
+    res.render('admin/view-coupons', { adminLogin: true, data: data })
   })
 
 })
 
-
-
-
-// router.post('/dashboard', function(req, res) {
-//   res.header('Cache-control','no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
-//   const { email,password } = req.body;
-//   if (email == emaildb && password == passworddb) {
-//      req.session.adminloggedIn=true
-// sms.adminLogin(req.body)
-//     res.redirect('/admin/admin-verify');
-//     console.log('login successfull');
-
-//   }else{
-//    loginErr =true
-//     res.redirect("/admin")
-//     console.log('login error');
-//   }
 
 router.post('/dashboard', function (req, res) {
   res.header('Cache-control', 'no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
@@ -346,8 +342,23 @@ router.get('/logout', (req, res) => {
   res.redirect('/admin')
 })
 
+router.get('/orders', async (req, res) => {
+  let orderData = await adminHelpers.getOrderList()
+  res.render('admin/orderList', { adminLogin: true, orderData: orderData })
+})
 
+router.get('/ordered_pro_details', (req, res) => {
 
+  let { orderId, productId } = req.query
+
+  // vendorHelper.orderedProDetails(proId).then((proDtails)=>{
+  //   res.render('vendor/orderedProDetails',{proDtails:proDtails})
+  // })
+  userHelper.orderedProList(productId).then(async (proDetails) => {
+    let orderData = await userHelper.orderDetails(orderId)
+    res.render('vendor/orderedProDetails', { proDetails: proDetails, orderData: orderData })
+  })
+})
 
 module.exports = router;
 

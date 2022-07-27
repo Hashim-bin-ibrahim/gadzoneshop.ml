@@ -1,12 +1,13 @@
 
 // add to cart ajax
 function addToCart(proId) {
+
     $.ajax({
         url: '/add-to-cart/' + proId,
         method: 'get',
         success: (response) => {
-            if(response.stockOut){
-        
+            if (response.stockOut) {
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -28,6 +29,43 @@ function addToCart(proId) {
 
 
                 $('#cart-count').load(`${location.href} #cart-count`)
+            }
+
+        }
+    })
+}
+
+
+
+
+function addToWishlist(proId) {
+
+    $.ajax({
+        url: '/add-to-wishlist/' + proId,
+        method: 'get',
+        success: (response) => {
+            if (response.stockOut) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Product out of stock'
+                })
+                window.location.reload();
+            }
+            if (response.status) {
+
+
+                window.location.reload();
             }
 
         }
@@ -333,8 +371,8 @@ function submitHandler(e) {
 }
 
 
-function packedOrder(orderId,productId) {
-  
+function packedOrder(orderId, productId) {
+
     $.ajax({
         url: location.origin + "/vendor/status_packed",
         method: 'POST',
@@ -342,8 +380,8 @@ function packedOrder(orderId,productId) {
             order_Id: orderId,
             product_Id: productId,
         },
-      
-        
+
+
         success: (response) => {
             if (response.status) {
                 window.location.reload();
@@ -355,29 +393,29 @@ function packedOrder(orderId,productId) {
 }
 
 
-function shippedOrder(orderId,productId) {
- 
-      $.ajax({
-          url: location.origin + "/vendor/status_shipped",
-          method: 'POST',
-          data: {
-              order_Id: orderId,
-              product_Id: productId,
-          },
-        
-          
-          success: (response) => {
-              if (response.status) {
-                window.location.reload();
-              }
-  
-          }
-  
-      })
-  }
+function shippedOrder(orderId, productId) {
 
-  function deliveredOrder(orderId,productId) {
- 
+    $.ajax({
+        url: location.origin + "/vendor/status_shipped",
+        method: 'POST',
+        data: {
+            order_Id: orderId,
+            product_Id: productId,
+        },
+
+
+        success: (response) => {
+            if (response.status) {
+                window.location.reload();
+            }
+
+        }
+
+    })
+}
+
+function deliveredOrder(orderId, productId) {
+
     $.ajax({
         url: location.origin + "/vendor/status_delivered",
         method: 'POST',
@@ -385,8 +423,8 @@ function shippedOrder(orderId,productId) {
             order_Id: orderId,
             product_Id: productId,
         },
-      
-        
+
+
         success: (response) => {
             if (response.status) {
                 window.location.reload();
@@ -398,17 +436,17 @@ function shippedOrder(orderId,productId) {
 }
 
 
-function cancelOrder(orderId,productId) {
- 
+function cancelOrder(orderId, productId) {
+
     $.ajax({
-        url: location.origin + "/vendor/status_cancelled",
+        url: "/vendor/status_cancelled",
         method: 'POST',
         data: {
             order_Id: orderId,
             product_Id: productId,
         },
-      
-        
+
+
         success: (response) => {
             if (response.status) {
                 window.location.reload();
@@ -426,13 +464,13 @@ function cancelOrder(orderId,productId) {
 
 // filter starts
 
-function brandFilter(brand_name){
+function brandFilter(brand_name) {
     $.ajax({
         url: '/band_filter/' + brand_name,
         method: 'get',
         success: (response) => {
-            if(response.stockOut){
-        
+            if (response.stockOut) {
+
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -455,6 +493,57 @@ function brandFilter(brand_name){
 
                 $('#cart-count').load(`${location.href} #cart-count`)
             }
+
+        }
+    })
+
+}
+
+
+function delete_Product(proId) {
+    $.ajax({
+        url: '/delete_product_from_wishlist/' + proId,
+        method: 'get',
+        success: (response) => {
+            if (response.status) {
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Product removed successfully'
+                })
+                $('#wish_list_Container').load(`${location.href} #wish_list_Container`)
+            }
+            if (response.productExist) {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Product alredy exist in your cart'
+                })
+                $('#wish_list_Container').load(`${location.href} #wish_list_Container`)
+
+            }
+
 
         }
     })

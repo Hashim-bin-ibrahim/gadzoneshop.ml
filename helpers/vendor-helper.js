@@ -485,6 +485,7 @@ module.exports = {
 
   },
   packProduct : (orderId,productId)=>{
+    console.log(orderId,productId,"lllllllllllllllllllllllllllllloooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiii");
     return new Promise(async(resolve,reject)=>{
       await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
       {
@@ -562,5 +563,237 @@ module.exports = {
       resolve(userData)
 
     })
-  }
+  },
+  getRevenue: (vendorId) => {
+    let paymentData = []
+    return new Promise(async(resolve, reject) => {
+        let COD_revenue = await order.aggregate([
+          {
+            '$unwind': {
+              'path': '$products'
+            }
+          }, {
+            '$lookup': {
+              'from': 'products', 
+              'localField': 'products.product', 
+              'foreignField': '_id', 
+              'as': 'productLookup'
+            }
+          }, {
+            '$unwind': {
+              'path': '$productLookup'
+            }
+          }, {
+            '$match': {
+              'productLookup.createdBy': objectId(vendorId)
+            }
+          },
+          {
+            '$match': {
+              'paymentType': 'COD'
+            }
+          },
+          {
+            '$unwind': {
+              'path': '$products'
+            }
+          }, {
+            '$match': {
+              'products.orderStatus': 'delivered'
+            }
+          }
+        ])
+          console.log(COD_revenue);
+          let COD_length  = COD_revenue.length
+          console.log(COD_length);
+          paymentData.push(COD_length)
+
+          let online_Revenue = await order.aggregate([
+            {
+              '$unwind': {
+                'path': '$products'
+              }
+            }, {
+              '$lookup': {
+                'from': 'products', 
+                'localField': 'products.product', 
+                'foreignField': '_id', 
+                'as': 'productLookup'
+              }
+            }, {
+              '$unwind': {
+                'path': '$productLookup'
+              }
+            }, {
+              '$match': {
+                'productLookup.createdBy': objectId(vendorId)
+              }
+            },
+            {
+              '$match': {
+                'paymentType': 'COD'
+              }
+            },
+            {
+              '$unwind': {
+                'path': '$products'
+              }
+            }, {
+              '$match': {
+                'products.orderStatus': 'delivered'
+              }
+            }
+          ])
+
+          let online_length  = online_Revenue.length
+        
+          paymentData.push(online_length)
+
+          
+          resolve(paymentData)
+
+    })
+},
+
+dailyEarning :(vendorId)=>{
+    let dateIso = new Date()
+    let date = moment(dateIso).format('DD-MM-YYYY')
+    console.log(date);
+    return new Promise(async(resolve,reject)=>{
+        let dailyEarnings = await order.aggregate([
+          {
+            '$unwind': {
+              'path': '$products'
+            }
+          }, {
+            '$lookup': {
+              'from': 'products', 
+              'localField': 'products.product', 
+              'foreignField': '_id', 
+              'as': 'productLookup'
+            }
+          }, {
+            '$unwind': {
+              'path': '$productLookup'
+            }
+          }, {
+            '$match': {
+              'productLookup.createdBy': objectId(vendorId)
+            }
+          },
+            {
+              '$match': {
+                '__v': 0
+              }
+            }, {
+              '$unwind': {
+                'path': '$products'
+              }
+            }, {
+              '$match': {
+                'products.orderStatus': 'delivered'
+              }
+            },
+            {
+                '$project': {
+
+                    totalAmount:1,
+                    createdAt: { $dateToString: { format: "%d-%m-%Y", date: '$createdAt' } },
+                }
+            },
+            // {
+            //     '$match':{
+            //         createdAt : date
+            //     }
+            // },
+            {
+                '$group': {
+                  '_id': 'null', 
+                  'totalAmount': {
+                    '$sum': '$totalAmount'
+                  }
+                }
+              }
+          ])
+          console.log(dailyEarnings);
+          let sum = dailyEarnings[0].totalAmount
+     
+        resolve(sum)
+
+    })
+
+},
+
+dailySales:(vendorId)=>{
+    return new Promise(async(resolve,reject)=>{
+        let sales = await order.aggregate(
+            [
+              {
+                '$unwind': {
+                  'path': '$products'
+                }
+              }, {
+                '$lookup': {
+                  'from': 'products', 
+                  'localField': 'products.product', 
+                  'foreignField': '_id', 
+                  'as': 'productLookup'
+                }
+              }, {
+                '$unwind': {
+                  'path': '$productLookup'
+                }
+              }, {
+                '$match': {
+                  'productLookup.createdBy': objectId(vendorId)
+                }
+              },
+                
+              ]
+
+        )
+        let count = sales.length
+        resolve(count)
+
+    })
+  
+},
+totalUsers:()=>{
+    return new Promise(async(resolve,reject)=>{
+        let allUsers = await order.aggregate(
+            [
+              {
+                '$unwind': {
+                  'path': '$products'
+                }
+              }, {
+                '$lookup': {
+                  'from': 'products', 
+                  'localField': 'products.product', 
+                  'foreignField': '_id', 
+                  'as': 'productLookup'
+                }
+              }, {
+                '$unwind': {
+                  'path': '$productLookup'
+                }
+              }, {
+                '$match': {
+                  'productLookup.createdBy': objectId(vendorId)
+                }
+              },
+              ]
+        )
+        total_users = allUsers.length
+        resolve(total_users)
+    })
+
 }
+
+}
+
+
+
+
+
+

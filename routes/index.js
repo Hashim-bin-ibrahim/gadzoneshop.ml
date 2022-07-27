@@ -1,11 +1,13 @@
 var express = require('express');
 const session = require('express-session');
 const async = require('hbs/lib/async');
+const { response } = require('../app');
 var router = express.Router();
 var sms = require('../config/verify');
 const userHelpers = require('../helpers/user-helpers');
 var vendorHelper = require('../helpers/vendor-helper')
 const activeCat = require('../middleWare/activeCat');
+const { route } = require('./admin');
 
 
 
@@ -16,23 +18,30 @@ function userLoggedIn(req, res, next) {
 
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  vendorHelper.avlPro().then(async (data) => {
+router.get('/',  async(req, res, next) =>{
+ 
     userDetails = req.session.user
 
     const rendorData = {}
 
     let cartCount = null
-    if (req.session.user) {
-      cartCount = await userHelpers.getCartCount(req.session.user._id)
+     if(req.session.user) {
+      cartCount =  userHelpers.getCartCount(req.session.user._id)
     }
 
+    let mobileData = await userHelpers.mobileData()
+    let tabletData = await userHelpers.tabletData()
+    let laptopData = await userHelpers.laptopData()
+
     let avlCat = await activeCat.availableCat(rendorData)
+    rendorData.avlCat = avlCat
+    rendorData.laptopData = laptopData
+    rendorData.tabletData = tabletData
     rendorData.cartCount = cartCount
-    rendorData.data = data
+    rendorData.mobileData = mobileData
     rendorData.userDetails = userDetails
     res.render('index', rendorData);
-  })
+  
 });
 
 
@@ -42,6 +51,7 @@ router.get('/login', (req, res) => {
   if (req.session.userLoggIn) {
     res.redirect('/');
   } else
+
     res.render('user/user-login', {loginErr :req.session.loginErr, Login: true })
      req.session.loginErr = false
 })
@@ -222,6 +232,24 @@ router.post('/addToCart', (req, res) => {
   })
 })
 
+router.get('/add__To__cart/:id',(req,res)=>{
+  let qnty = 1
+  let userId = req.session.user._id
+  let proId = req.params.id
+  userHelpers.add_To_Cart_frm_wishlst(proId,userId,qnty).then((response) => {
+    if(response.stockOut){
+      
+      res.json(response)
+    }
+    if(response.productExist){
+      res.json(response)
+    }
+    else{
+    
+      res.json({ status: true })
+    }
+  })
+})
 
 
 router.get('/cart', userLoggedIn, async (req, res) => {
@@ -244,6 +272,7 @@ router.get('/cart', userLoggedIn, async (req, res) => {
   // let subTotal = req.session.cartsum
   res.render('user/cart', { cartProducts, cartSum, cartCount })
 })
+
 
 
 
@@ -341,7 +370,9 @@ router.post('/checkOut-post', async (req, res) => {
 })
 
 
-router.post('/place-order', async (req, res) => {
+router.post('/place-order', async (req,res,next) => {
+  try {
+    
   let grand_Total = req.body.grandTotal
   let addressId = req.body.addressDetails
   let userId = req.session.user._id
@@ -364,6 +395,9 @@ router.post('/place-order', async (req, res) => {
       })
     }
   })
+} catch (error) {
+    next(error)
+}
 })
 
 router.post('/verify-payment', (req, res) => {
@@ -434,6 +468,17 @@ router.post('/couponCheck', async (req, res) => {
 
 })
 
+router.get('/delete_product_from_wishlist/:id',async(req,res)=>{
+let  proId = req.params.id
+await userHelpers.delete_product_from_wishlist(proId).then((response)=>{
+  if(response.deleted){
+    res.json({status:true})
+  }
+})
+
+
+})
+
 
 router.get('/my_profile',userLoggedIn, async (req, res) => {
   let rendorData = {}
@@ -458,11 +503,40 @@ router.get('/band_filter/:name', async(req,res)=>{
   let brand_name = req.params.name
 
   let brand_filter = await userHelpers.brandFilter(brand_name)
-  console.log("_-----------------------------------------------------------------------------------------------------------------------------");
+  
   console.log(brand_filter);
   
 
 })
+
+router.get('/navbar',(req,res)=>{
+  res.render('user/navbar',{error:true})
+})
+
+router.get('/wishList',async(req,res)=>{
+  userId = req.session.user._id
+  let wishProducts  =  await  userHelpers.wishedItems(userId)
+
+  res.render('user/wishList',{wishProducts:wishProducts})
+})
+
+
+router.get('/add-to-wishlist/:id', userLoggedIn, (req, res) => {
+  let proId = req.params.id
+  let userId = req.session.user._id
+ 
+  userHelpers.addToWishlist(proId, userId).then((response) => {
+    if(response.stockOut){
+      res.json(response)
+    }else{
+      res.json({ status: true })
+    }
+  
+    
+  })
+})
+
+
 
 module.exports = router;
 
@@ -471,22 +545,3 @@ module.exports = router;
 
 
 
-
-// userHelpers.getAddress(addressId,userId).then((response)=>{
-//   let userAddress = response.userAddress
-
-// let totalPrice = cartSum[0].subTotal
-// let cartProducts =  userHelpers.getCartProducts(userId)
-
-// userHelpers.placeOrder(userAddress, userId, cartSum, cartProducts).then((orderId) => {
-//  if (req.body['paymentMethod'] === 'COD') {
-//    res.json({ COD_success: true })
-
-//  }
-//  else {
-//    userHelpers.generateRazorPAy(orderId, totalPrice).then((response) => {
-//      res.json(response)
-//    })
-//  }
-// })
-// })
