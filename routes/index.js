@@ -1,13 +1,10 @@
 var express = require('express');
-const session = require('express-session');
-const async = require('hbs/lib/async');
-const { response } = require('../app');
 var router = express.Router();
 var sms = require('../config/verify');
 const userHelpers = require('../helpers/user-helpers');
 var vendorHelper = require('../helpers/vendor-helper')
 const activeCat = require('../middleWare/activeCat');
-const { route } = require('./admin');
+
 
 
 
@@ -313,7 +310,6 @@ router.get('/product-details/:id', (req, res) => {
 
     res.render('user/productDetails', rendorData)
   })
-
 })
 
 

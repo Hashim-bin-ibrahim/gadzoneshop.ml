@@ -1,11 +1,21 @@
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1/endlessBlooms',{
-    
-    useNewUrlParser:true
+const mongoose = require('mongoose')
 
-}).then(()=>{
-    console.log('connection Successfull');
+const server = '127.0.0.1:27017'; //db server
+const dbname = 'endless'; // database name
 
-}).catch((e)=>{
-    console.log(e+"no connection");
-})
+class Database{
+    constructor(){
+        this._connect()
+    }
+    _connect(){
+        mongoose.connect(`mongodb://${server}/${dbname}`)
+        .then(()=>{
+            console.log("db connection successfull");
+        })
+        .catch(err =>{
+            console.error('db connection error');
+        })
+    }
+}
+
+module.exports = new Database()

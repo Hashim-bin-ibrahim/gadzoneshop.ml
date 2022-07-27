@@ -1,13 +1,12 @@
 var db = require('../config/connection')
-const { resolve } = require('path')
-const async = require('hbs/lib/async')
+
 var objectId = require('mongodb').ObjectId
 var bcrypt = require('bcrypt')
 const category = require('../models/category')
 const Vendor = require('../models/vendor')
 
 const product = require('../models/product')
-const req = require('express/lib/request')
+
 const { Promise } = require('mongoose')
 const coupon = require('../models/coupon')
 const order = require('../models/order')

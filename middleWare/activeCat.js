@@ -1,6 +1,4 @@
 
-const async = require('hbs/lib/async')
-const { resolve } = require('path')
 var db = require('../config/connection')
 const category = require('../models/category')
 const product = require('../models/product')
