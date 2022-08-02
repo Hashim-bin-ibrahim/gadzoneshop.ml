@@ -6,8 +6,6 @@ var vendorHelper = require('../helpers/vendor-helper')
 const activeCat = require('../middleWare/activeCat');
 
 
-
-
 //middleware for user session  checking
 function userLoggedIn(req, res, next) {
   req.session.userLoggIn ? next() : res.redirect('/login')
@@ -21,6 +19,7 @@ router.get('/',  async(req, res, next) =>{
 
     const rendorData = {}
 
+    
     let cartCount = 0;
      if(req.session.user) {
       cartCount =  userHelpers.getCartCount(req.session.user._id)
