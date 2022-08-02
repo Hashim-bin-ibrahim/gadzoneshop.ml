@@ -13,6 +13,10 @@ function userLoggedIn(req, res, next) {
 
 
 /* GET home page. */
+
+
+
+
 router.get('/',  async(req, res, next) =>{
  
     userDetails = req.session.user
