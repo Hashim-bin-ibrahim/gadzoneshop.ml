@@ -6,7 +6,7 @@ const category = require('../models/category')
 const Vendor = require('../models/vendor')
 
 const product = require('../models/product')
-
+const moment = require('moment')
 const { Promise } = require('mongoose')
 const coupon = require('../models/coupon')
 const order = require('../models/order')
@@ -412,11 +412,13 @@ module.exports = {
           '$unwind': {
             'path': '$productLookup'
           }
-        }, {
-          '$unwind': {
-            'path': '$productLookup.productPictures'
-          }
-        }, {
+        }, 
+        // {
+        //   '$unwind': {
+        //     'path': '$productLookup.productPictures'
+        //   }
+        // },
+         {
           '$lookup': {
             'from': 'vendors',
             'localField': 'productLookup.createdBy',
@@ -439,6 +441,42 @@ module.exports = {
       ])
 
       resolve(orderList)
+    })
+
+  },
+  orderDetails: (orderId,productId) => {
+    return new Promise(async (resolve, reject) => {
+
+      let orderDetails = await order.aggregate([
+        {
+          '$match': {
+            '_id': objectId(orderId)
+          }
+        }, {
+          '$unwind': {
+            'path': '$products'
+          }
+        },
+        {
+          '$match':{
+            'products.product':objectId(productId)
+          }
+        }, {
+          '$project': {
+            '_id': 1,
+            'user': 1,
+            'products': 1,
+            'totalAmount': 1,
+            'paymentType': 1,
+            'cart': 1,
+            'address': 1,
+            createdAt: { $dateToString: { format: "%Y-%m-%d", date: '$createdAt' } }
+          }
+        }
+      ])
+      console.log(orderDetails,"888888888888888888888888888888888888888888888");
+      resolve(orderDetails)
+
     })
 
   },
@@ -484,7 +522,6 @@ module.exports = {
 
   },
   packProduct : (orderId,productId)=>{
-    console.log(orderId,productId,"lllllllllllllllllllllllllllllloooooooooooooooooooooooooooooiiiiiiiiiiiiiiiiiiiii");
     return new Promise(async(resolve,reject)=>{
       await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
       {
@@ -492,7 +529,6 @@ module.exports = {
           'products.$.placed' : false,'products.$.packed':true,'products.$.orderStatus' : "packed"
         }
       }).then((response)=>{
-        
         response.status = true
         resolve(response)
       })
@@ -531,7 +567,12 @@ module.exports = {
       await order.updateOne({_id:objectId(orderId),'products.product':objectId(productId)},
       {
         $set : {
-          'products.$.delivered' : false,'products.$.cancelled':true,'products.$.orderStatus' : "cancelled"
+          'products.$.placed' : false,
+          'products.$.packed' : false,
+          'products.$.shipped' : false,
+          'products.$.delivered' : false,
+          'products.$.cancelled':true,
+          'products.$.orderStatus' : "cancelled"
         }
       }).then((response)=>{
         response.status = true
@@ -565,7 +606,7 @@ module.exports = {
   },
   getRevenue: (vendorId) => {
     let paymentData = []
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async(resolve, reject) => {  
         let COD_revenue = await order.aggregate([
           {
             '$unwind': {
@@ -657,8 +698,10 @@ module.exports = {
 dailyEarning :(vendorId)=>{
     let dateIso = new Date()
     let date = moment(dateIso).format('DD-MM-YYYY')
-    console.log(date);
+    let datestring = date.toString
+    console.log(datestring,"new date   today");
     return new Promise(async(resolve,reject)=>{
+
         let dailyEarnings = await order.aggregate([
           {
             '$unwind': {
@@ -675,20 +718,13 @@ dailyEarning :(vendorId)=>{
             '$unwind': {
               'path': '$productLookup'
             }
-          }, {
+          }, 
+        {
             '$match': {
               'productLookup.createdBy': objectId(vendorId)
             }
           },
             {
-              '$match': {
-                '__v': 0
-              }
-            }, {
-              '$unwind': {
-                'path': '$products'
-              }
-            }, {
               '$match': {
                 'products.orderStatus': 'delivered'
               }
@@ -696,28 +732,30 @@ dailyEarning :(vendorId)=>{
             {
                 '$project': {
 
-                    totalAmount:1,
+                    
+                    productLookup:1,
                     createdAt: { $dateToString: { format: "%d-%m-%Y", date: '$createdAt' } },
                 }
             },
             // {
             //     '$match':{
-            //         createdAt : date
+            //         'createdAt' : datestring
             //     }
             // },
             {
                 '$group': {
                   '_id': 'null', 
                   'totalAmount': {
-                    '$sum': '$totalAmount'
+                    '$sum': '$productLookup.price'
                   }
                 }
               }
-          ])
-          console.log(dailyEarnings);
-          let sum = dailyEarnings[0].totalAmount
+        ])
+       
+          console.log(dailyEarnings,"555555555555555555555555555555555555555555555");
+      
      
-        resolve(sum)
+        resolve(dailyEarnings)
 
     })
 
@@ -731,7 +769,8 @@ dailySales:(vendorId)=>{
                 '$unwind': {
                   'path': '$products'
                 }
-              }, {
+              },
+               {
                 '$lookup': {
                   'from': 'products', 
                   'localField': 'products.product', 
@@ -757,7 +796,7 @@ dailySales:(vendorId)=>{
     })
   
 },
-totalUsers:()=>{
+totalUsers:(vendorId)=>{
     return new Promise(async(resolve,reject)=>{
         let allUsers = await order.aggregate(
             [
@@ -781,6 +820,11 @@ totalUsers:()=>{
                   'productLookup.createdBy': objectId(vendorId)
                 }
               },
+              {
+                '$group': {
+                  '_id': '$user'
+                }
+              }
               ]
         )
         total_users = allUsers.length

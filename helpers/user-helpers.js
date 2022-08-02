@@ -875,7 +875,7 @@ module.exports = {
     })
 
   },
-  orderDetails: (orderId) => {
+  orderDetails: (orderId,productId) => {
     return new Promise(async (resolve, reject) => {
 
       let orderDetails = await order.aggregate([
@@ -886,6 +886,11 @@ module.exports = {
         }, {
           '$unwind': {
             'path': '$products'
+          }
+        },
+        {
+          '$match':{
+            'products.product':objectId(productId)
           }
         }, {
           '$project': {
@@ -900,6 +905,7 @@ module.exports = {
           }
         }
       ])
+      console.log(orderDetails,"888888888888888888888888888888888888888888888");
       resolve(orderDetails)
 
     })

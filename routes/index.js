@@ -21,7 +21,7 @@ router.get('/',  async(req, res, next) =>{
 
     const rendorData = {}
 
-    let cartCount = null
+    let cartCount = 0;
      if(req.session.user) {
       cartCount =  userHelpers.getCartCount(req.session.user._id)
     }
@@ -405,7 +405,6 @@ router.post('/verify-payment', (req, res) => {
     console.log(err);
     res.json({ status: false })
   })
-
 })
 
 
@@ -418,16 +417,17 @@ router.get('/order', async (req, res) => {
   })
 })
 
+
 router.get('/order-success', (req, res) => {
   res.render('user/order-success')
 })
+
 
 router.get('/payment/:id', async (req, res) => {
   let address = req.params.id
   let userId = req.session.user._id
   let cartPro = await userHelpers.showCartPro(userId)
   let AvailCoupon = await userHelpers.getCoupon()
-
   let cartSum = req.session.cartsum
   let rendorData = {}
   rendorData.AvailCoupon = AvailCoupon
@@ -442,7 +442,8 @@ router.get('/ordered-pro-details', (req, res) => {
   
   userHelpers.orderedProList(productId).then(async(proDetails) => {
   
-    let orderData =await userHelpers.orderDetails(orderId)
+    let orderData =await userHelpers.orderDetails(orderId,productId)
+    console.log(orderData,"=========================user side Order    Data===========================");
     res.render('user/ordered_pro-details', { proDetails:proDetails,orderData:orderData })
   })
 

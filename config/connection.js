@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const server = '127.0.0.1:27017'; //db server
-const dbname = 'endless'; // database name
+const dbname = 'endlessBlooms'; // database name
 
 class Database{
     constructor(){

@@ -32,16 +32,19 @@ router.get('/vendor-dash',async (req, res) => {
   let renderdata = {}
   if (req.session.vendorLogiin) {
     res.header('Cache-control', 'no-cache,private, no-store, must-revalidate,max-stale=0,post-check=0,pre-check=0');
-    const vendorId = req.session.vendorDetails
-    let daily_earning = await adminHelpers.dailyEarning(vendorId)
-    let payment_Data = await adminHelpers.getRevenue(vendorId)
-    let sales = await adminHelpers.dailySales(vendorId)
-    let users = await adminHelpers.totalUsers(vendorId)
+    const vendorId = req.session.vendorDetails._id
+    let daily_earning = await vendorHelper.dailyEarning(vendorId)
+
+    console.log(daily_earning);
+
+    let payment_Data = await vendorHelper.getRevenue(vendorId)
+    let sales = await vendorHelper.dailySales(vendorId)
+     let users = await vendorHelper.totalUsers(vendorId)
 
     renderdata.sales = sales
-    renderdata.users = users
+     renderdata.users = users
     renderdata.daily_earning = daily_earning,
-      renderdata.payment_Data = payment_Data
+    renderdata.payment_Data = payment_Data
     renderdata.vendorLogin = true
     renderdata.vendorId = vendorId
 
@@ -134,18 +137,12 @@ router.post('/vendor-dash',(req, res) => {
       //let user = await Vendor.findOne({email : req.body.email})
       req.session.vendorLogiin = true
       req.session.vendorDetails = response.vendorDetails;
-      
       res.redirect('/vendor/vendor-dash')
-
     } else {
       req.session.loginError = true,
-        console.log("cannot go..restricted");
       res.redirect('/vendor')
     }
-
   })
-
-
 })
 
 
@@ -326,7 +323,7 @@ router.get('/ordered_pro_details',(req,res)=>{
   //   res.render('vendor/orderedProDetails',{proDtails:proDtails})
   // })
   userHelper.orderedProList(productId).then(async(proDetails) => {
-    let orderData =await userHelper.orderDetails(orderId)
+    let orderData =await vendorHelper.orderDetails(orderId,productId)
     res.render('vendor/orderedProDetails',{proDetails:proDetails,orderData:orderData})
   })
 })

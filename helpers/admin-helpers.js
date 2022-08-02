@@ -286,9 +286,8 @@ module.exports = {
                   }
               ])
               console.log(dailyEarnings);
-              let sum = dailyEarnings[0].totalAmount
-         
-            resolve(sum)
+         console.log("==========================");
+            resolve(dailyEarnings)
 
         })
 

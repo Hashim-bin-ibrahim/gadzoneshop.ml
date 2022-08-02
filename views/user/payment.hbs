@@ -54,7 +54,8 @@
                                     <tr>
                                         <th>Bag Total</th>
                                         <td style="text-align: right;">{{this.subTotal}}</td>
-                                        <input type="text" name="subtotal" id="cart_subtotal" value="{{this.subTotal}}" hidden>
+                                        <input type="text" name="subtotal" id="cart_subtotal" value="{{this.subTotal}}"
+                                            hidden>
                                     </tr>
                                     <tr>
                                         <th>Coupon Saving</th>
@@ -62,8 +63,10 @@
                                     </tr>
                                     <tr>
                                         <th style="font-weight: 600;">Amount Payable</th>
-                                        <td id="grandTotal" style="text-align: right; font-weight: 600;">{{this.subTotal}}</td>
-                                        <input id="hiddenGrandTotal"  type="text" name="grandTotal" value="{{this.subTotal}}" hidden>
+                                        <td id="grandTotal" style="text-align: right; font-weight: 600;">
+                                            {{this.subTotal}}</td>
+                                        <input id="hiddenGrandTotal" type="text" name="grandTotal"
+                                            value="{{this.subTotal}}" hidden>
                                     </tr>
                                     {{/each}}
                                 </table>
@@ -99,36 +102,41 @@
                                     {{!-- hidden input for sending address to next field --}}
                                     <input type="text" name="addressDetails" value="{{address}}" id="" hidden>
                                     <div class="checkout__order">
-                                        
+
                                         <div class="checkout__order__product">
                                             {{#each AvailCoupon}}
-                                            <div class="single_coupon mb-1" >
-                                                <input id="radio_coupon" type="radio" onclick="myFunction('{{this.couponCode}}','{{this.couponValue}}')" name="abc" value="{{this.couponCode}}">
+                                            <div class="single_coupon mb-1">
+                                                <input id="radio_coupon" type="radio"
+                                                    onclick="myFunction('{{this.couponCode}}','{{this.couponValue}}')"
+                                                    name="abc" value="{{this.couponCode}}">
                                                 <table>
-                                                    <tr >
-                                                        <th class="couponCode">{{this.couponCode}}</th>                                                      
+                                                    <tr>
+                                                        <th class="couponCode">{{this.couponCode}}</th>
                                                     </tr>
-                                                    <tr >
+                                                    <tr>
                                                         <td class="description">{{this.description}}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td id="couponValue"  class="couponValue">{{this.couponValue}} </td>
+                                                        <td id="couponValue" class="couponValue">{{this.couponValue}}
+                                                        </td>
                                                     </tr>
-                                                     <input type="text" id="result" hidden>
-                                                     <input type="text"  id="coupon_values" hidden>
+                                                    <input type="text" id="result" hidden>
+                                                    <input type="text" id="coupon_values" hidden>
                                                 </table>
                                             </div>
-                                           
+
                                             {{/each}}
 
 
                                         </div>
                                         <div class="row">
-                                             <button type="button" onclick="addCoupon()" class="site-btn mt-2">Apply Coupon</button>
-                                             <button class="site-btn mt-3" onclick="removeCoupon()" type="reset" value="No need of coupon">Reset Coupon</button>
+                                            <button type="button" onclick="addCoupon()" class="site-btn mt-2">Apply
+                                                Coupon</button>
+                                            <button class="site-btn mt-3" onclick="removeCoupon()" type="reset"
+                                                value="No need of coupon">Reset Coupon</button>
 
                                         </div>
-                                       
+
                                     </div>
                                 </form>
                             </div>
@@ -154,12 +162,26 @@
                 method: "POST",
                 data: $form2.serialize(),
                 success: (response) => {
-
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Order Placed Successfully'
+                    })
                     if (response.COD_success) {
-                        alert('order placed')
+
                         location.href = '/order'
                     } else {
-                        alert("razorpay started")
+                       
                         razorpayPayment(response)
                     }
 
